@@ -19,7 +19,7 @@ class MySQLConnect {
         try {
             // The newInstance() call is a work around for some
             // broken Java implementations.
-            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
+            Class.forName("com.mysql.cj.jdbc.Driver");
 
             String url = "jdbc:mysql://localhost/mydb2" +
                     "?verifyServerCertificate=false" +

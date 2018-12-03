@@ -41,7 +41,6 @@ class AccountImplement implements Account{
 		//load user data
 		findAccountID(username);
 		loadUserData(ID);
-
 	}
 
 	/**
@@ -72,11 +71,11 @@ class AccountImplement implements Account{
 	private void loadUserData(int ID) {
 		try {
 			statement = con.createStatement();
-			String sql = "SELECT  name, lastname, SIN, birthdate,balleft,balright,currency," +
-					"lastactivity FROM bankdb WHERE accountID = " + ID;
+			String sql = "SELECT  name, lastname, SIN, birthdate, balleft, balright, currency, " +
+					"lastactivity FROM bankdb WHERE accountID=" + ID;
 			ResultSet rs = statement.executeQuery(sql);
 
-			while(rs.next()){
+			while (rs.next()) {
 				//Retrieve by column name
 				name  = rs.getString("name");
 				lastName = rs.getString("lastname");
@@ -86,7 +85,6 @@ class AccountImplement implements Account{
 				balRight = rs.getInt("balright");
 				currency = rs.getString("currency");
 				lastActivity = rs.getString("lastactivity");
-
 			}
 			rs.close();
 		} catch (Exception e1) {
@@ -127,8 +125,7 @@ class AccountImplement implements Account{
 			 else {
 
 				 statement = con.createStatement();
-				 String sql = "UPDATE bankdb " +
-						 "SET name='" + name + "' WHERE accountID = " + ID;
+				 String sql = "UPDATE bankdb SET name='" + name + "' WHERE accountID = " + ID;
 				 statement.executeUpdate(sql);
 				 isSuccess = true;
 			 }
@@ -152,8 +149,7 @@ class AccountImplement implements Account{
 			 }
 			 else {
 				 statement = con.createStatement();
-				 String sql = "UPDATE bankdb " +
-						 "SET lastname='" + lastName + "' WHERE accountID = " + ID;
+				 String sql = "UPDATE bankdb SET lastname='" + lastName + "' WHERE accountID = " + ID;
 				 statement.executeUpdate(sql);
 				 isSuccess = true;
 			 }
@@ -176,8 +172,7 @@ class AccountImplement implements Account{
 			 }
 			 else {
 				 statement = con.createStatement();
-				 String sql = "UPDATE bankdb " +
-						 "SET birthdate='" + birthDate + "' WHERE accountID = " + ID;
+				 String sql = "UPDATE bankdb SET birthdate='" + birthDate + "' WHERE accountID = " + ID;
 				 statement.executeUpdate(sql);
 				 isSuccess = true;
 			 }
@@ -202,8 +197,7 @@ class AccountImplement implements Account{
 			 }
 			 else {
 				 statement = con.createStatement();
-				 String sql = "UPDATE bankdb " +
-						 "SET SIN=" + SIN + " WHERE accountID = " + ID;
+				 String sql = "UPDATE bankdb SET SIN=" + SIN + " WHERE accountID=" + ID;
 				 statement.executeUpdate(sql);
 				 isSuccess = true;
 			 }
@@ -232,8 +226,7 @@ class AccountImplement implements Account{
 
 		 try {
 			 statement = con.createStatement();
-			 String sql = "UPDATE bankdb " +
-					 "SET balleft=" + balLeft +" WHERE accountID = " + ID;
+			 String sql = "UPDATE bankdb SET balleft=" + balLeft + " WHERE accountID=" + ID;
 			 statement.executeUpdate(sql);
 			 isSuccess = true;
 
@@ -253,8 +246,7 @@ class AccountImplement implements Account{
 
 		 try {
 			 statement = con.createStatement();
-			 String sql = "UPDATE bankdb " +
-					 "SET balright=" + balRight +" WHERE accountID = " + ID;
+			 String sql = "UPDATE bankdb SET balright=" + balRight + " WHERE accountID=" + ID;
 			 statement.executeUpdate(sql);
 			 isSuccess = true;
 
@@ -274,8 +266,7 @@ class AccountImplement implements Account{
 
 		 try {
 			 statement = con.createStatement();
-			 String sql = "UPDATE bankdb " +
-					 "SET currency='" + currency +"' WHERE accountID = " + ID;
+			 String sql = "UPDATE bankdb SET currency='" + currency + "' WHERE accountID=" + ID;
 			 statement.executeUpdate(sql);
 			 isSuccess = true;
 
@@ -296,7 +287,7 @@ class AccountImplement implements Account{
 		 try {
 			 statement = con.createStatement();
 			 String sql = "UPDATE bankdb " +
-					 "SET lastactivity='" + lastActivity + "' WHERE accountID = " + ID;
+					 "SET lastactivity='" + lastActivity + "' WHERE accountID= " + ID;
 			 statement.executeUpdate(sql);
 			 isSuccess = true;
 
@@ -394,11 +385,11 @@ class AccountImplement implements Account{
 				statement = con.createStatement();
 				String sql = "INSERT INTO bankdb(accountID, name, lastname, SIN, birthdate, " +
 						"balleft, balright, currency,lastactivity) " +
-						" VALUES("+ newID +",'"+name+"','"+ lastName+ "',"+SIN+",'"+birthDate+"',"+balLeft+","+
-						balRight+",'"+currency+"','none');";
+						" VALUES(" + newID + ", '" + name + "', '" + lastName + "', " + SIN + ", '" + birthDate +
+						"', " + balLeft + ", " + balRight + ", '" + currency + "', 'none');";
 
 				String sql2 = "INSERT INTO account(accountID, Username, Password) " +
-						"VALUES("+ newID + ",'"+name+"',"+SIN+"); ";
+						"VALUES(" + newID + ", '" + name + "', " + SIN + "); ";
 
 				statement.executeUpdate(sql);
 				statement.executeUpdate(sql2);
@@ -421,9 +412,9 @@ class AccountImplement implements Account{
 		try {
 			statement = con.createStatement();
 			String sql = "DELETE FROM bankdb " +
-					" WHERE accountID ="+ accountID;
+					" WHERE accountID="+ accountID;
 			String sql2 = "DELETE FROM account " +
-					" WHERE accountID ="+ accountID;
+					" WHERE accountID="+ accountID;
 			statement.executeUpdate(sql);
 			statement.executeUpdate(sql2);
 			isSuccess = true;

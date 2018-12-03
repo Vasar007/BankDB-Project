@@ -9,5 +9,5 @@ class ChequingAccount extends AccountImplement {
 
 	ChequingAccount(String username){
 		super(username);
-		}
+	}
 }

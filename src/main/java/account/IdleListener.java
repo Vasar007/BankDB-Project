@@ -64,9 +64,7 @@ class IdleListener implements AWTEventListener, ActionListener {
     void startTimer() {
         timer = new Timer(1000, this);
         timer.start();
-
     }
-
 }
 
 

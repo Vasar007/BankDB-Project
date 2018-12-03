@@ -1,6 +1,5 @@
 package account;
 
-import javax.jws.soap.SOAPBinding;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;

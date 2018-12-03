@@ -268,9 +268,8 @@ class Admin extends JFrame implements ActionListener {
      * @return ID of type int
      */
     private static int createID(ArrayList<String> list) {
-        int newID;
         Random random = new Random();
-        newID = random.nextInt(1000000);
+        int newID = random.nextInt(1000000);
 
         ArrayList<Integer> newList = new ArrayList<>();
 
@@ -353,9 +352,9 @@ class Admin extends JFrame implements ActionListener {
             if (e.getSource() instanceof JComboBox) {
                 select = (String) cb.getSelectedItem();
                 //System.out.println(Integer.parseInt(select));
-                try{
+                try {
                     getUserData(Integer.parseInt(select));
-                }catch(Exception ex){
+                } catch (Exception ex){
                     textField1.setText("");
                     textField2.setText("");
                     textField3.setText("");
@@ -372,7 +371,7 @@ class Admin extends JFrame implements ActionListener {
         try {
             if ("SAVE".equals(e.getActionCommand())) {
 
-                if(select.equals("-- Create New --")){
+                if (select.equals("-- Create New --")) {
                     ChequingAccount newUser = new ChequingAccount(newID);
                     newUser.setID(newID);
                     updateInfo(newUser);
@@ -416,9 +415,4 @@ class Admin extends JFrame implements ActionListener {
             }
         }
     }
-
-    /*public static void main(String[] args) {
-
-        java.awt.EventQueue.invokeLater(() -> new Admin().setVisible(true));
-    }*/
 }

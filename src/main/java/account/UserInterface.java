@@ -297,7 +297,7 @@ class UserInterface extends JPanel implements ActionListener {
      */
     private boolean isLoginCorrect() {
         try {
-            String sql = "SELECT * FROM Account WHERE Username =? and Password =?";
+            String sql = "SELECT * FROM  account WHERE Username=? AND Password=?";
             PreparedStatement pst = con.prepareStatement(sql);
             pst.setString(1, username.getText());
             pst.setString(2, String.valueOf(pw.getPassword()));
