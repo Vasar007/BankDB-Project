@@ -23,7 +23,8 @@ class UserInterface extends JPanel implements ActionListener {
     private JProgressBar progress;
     private static final Color backgroundColor = Color.WHITE;
     private static final Color foregroundColor = Color.BLACK;
-    private int counter = 0, i = 0;
+    private int counter = 0;
+    private int i = 0;
     private String select = null;
     private static final int maxNumberOfTries = 5;
     private static JFrame frame;
@@ -168,45 +169,44 @@ class UserInterface extends JPanel implements ActionListener {
     /**
      * Closes the Frame after successful login
      */
-    public static void close(JFrame frame){
+    public static void close(JFrame frame) {
         WindowEvent wce = new WindowEvent(frame, WindowEvent.WINDOW_CLOSING);
         Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(wce);
     }
 
-    private void status(){
-        if(MySQLConnect.status){
+    private void status() {
+        if (MySQLConnect.status) {
             status.setIcon(online);
         } else status.setIcon(offline);
     }
 
     /**
      * Listens to the events */
-    public void actionPerformed(ActionEvent e) {
-        eventHandler(e);
+    public void actionPerformed(ActionEvent event) {
+        eventHandler(event);
     }
 
     /**
      * Handles the events depending on their status code
-     * @param e of type ActionEvent
+     * @param event of type ActionEvent
      */
     @SuppressWarnings("unchecked")
-    private void eventHandler(ActionEvent e) {
+    private void eventHandler(ActionEvent event) {
         status();
 
-        JComboBox<String> cb;
-
         // Event 1 ---> User Clicks on the Selection Box
-        if ("LIST".equals(e.getActionCommand())) {
-            cb = (JComboBox<String>) e.getSource();
+        if ("LIST".equals(event.getActionCommand())) {
+            JComboBox<String> cb = (JComboBox<String>) event.getSource();
 
-            if (e.getSource() instanceof JComboBox) {
+            if (event.getSource() instanceof JComboBox) {
                 select = (String) cb.getSelectedItem();
+                assert select != null;
                 updateLabel(select);
             }
         }
 
         // Event 2 ---> User enters a Username and a Password and presses on 'Enter'
-        if ("ENTER".equals(e.getActionCommand()) || "LOGIN".equals(e.getActionCommand())) {
+        if ("ENTER".equals(event.getActionCommand()) || "LOGIN".equals(event.getActionCommand())) {
 
             if (con == null) {
                 con = MySQLConnect.ConnectDB();
@@ -231,7 +231,7 @@ class UserInterface extends JPanel implements ActionListener {
                          cannotLogin();
                      }
                      // If admin or customers are logging in
-                     else if(select.equals("Customer Login")&& !username.getText().equals("admin")) {
+                     else if (select.equals("Customer Login")&& !username.getText().equals("admin")) {
                          // Close the current page and move to the Admin Panel
                          Customer customer = new Customer(username.getText(), frame);
                          customer.setVisible(true);
@@ -242,11 +242,11 @@ class UserInterface extends JPanel implements ActionListener {
                     }
                  }
                  else {
-                    cannotLogin();
+                     cannotLogin();
                  }
-            } catch (Exception e3) {
-                 JOptionPane.showMessageDialog(null, "Error --> Login Error..");
-                //e3.printStackTrace();
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                JOptionPane.showMessageDialog(null, "Error --> Login Error..");
             }
         }
     }
@@ -254,10 +254,10 @@ class UserInterface extends JPanel implements ActionListener {
     /**
      * Login Failure
      */
-    private void cannotLogin(){
+    private void cannotLogin() {
         counter++;
 
-        if(counter == maxNumberOfTries){
+        if (counter == maxNumberOfTries) {
             counter = 0;
             JOptionPane.showMessageDialog(this,
                     "Access Denied !(" + (counter) + " Remaining)");
@@ -275,7 +275,7 @@ class UserInterface extends JPanel implements ActionListener {
      * @param b of type boolean
      */
     private void progressBar(boolean b){
-        if(b) {
+        if (b) {
             progress.setForeground(Color.GREEN);
             while (i < 100) {
                 i++;
@@ -297,7 +297,7 @@ class UserInterface extends JPanel implements ActionListener {
      */
     private boolean isLoginCorrect() {
         try {
-            String sql = "SELECT * FROM  account WHERE Username=? AND Password=?";
+            String sql = "SELECT * FROM  account WHERE username=? AND password=?";
             PreparedStatement pst = con.prepareStatement(sql);
             pst.setString(1, username.getText());
             pst.setString(2, String.valueOf(pw.getPassword()));
@@ -306,7 +306,8 @@ class UserInterface extends JPanel implements ActionListener {
             if (rs.next())
                 return true;
 
-            } catch (Exception e2) {
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
                 JOptionPane.showMessageDialog(null, "Error --> System is Offline..");
             }
 

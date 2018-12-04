@@ -21,7 +21,7 @@ class MySQLConnect {
             // broken Java implementations.
             Class.forName("com.mysql.cj.jdbc.Driver");
 
-            String url = "jdbc:mysql://localhost/mydb2" +
+            String url = "jdbc:mysql://localhost/mydb" +
                     "?verifyServerCertificate=false" +
                     "&useSSL=false" +
                     "&requireSSL=false" +
@@ -41,6 +41,7 @@ class MySQLConnect {
             // Connection error
             status = false;
             System.out.println("Error occurred during connection to database!");
+            System.out.println(e.getMessage());
             return null;
         }
     }
@@ -49,25 +50,49 @@ class MySQLConnect {
      * Returns the list of customers from the database
      * @return list of type ArrayList
      */
-    static ArrayList getCustomers(){
-
+    static ArrayList<String> getCustomers(){
         ArrayList<String> list = new ArrayList<>();
 
         // Get the accountIDs
         try {
             Statement statement = con.createStatement();
-            String sql = "SELECT accountID FROM account";
+            String sql = "SELECT accountID FROM bankdb";
             ResultSet rs = statement.executeQuery(sql);
 
-            while(rs.next()) {
+            while (rs.next()) {
                 list.add(rs.getString("accountID"));
             }
             rs.close();
-        } catch (Exception e1) {
-            JOptionPane.showMessageDialog(null,"Load Unsuccessful!");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            JOptionPane.showMessageDialog(null,"Load Customers Unsuccessful!");
         }
 
         return list;
     }
 
+    /**
+     * Returns the list of customer bank accounts from the database
+     * @return list of type ArrayList
+     */
+    static ArrayList<String> getCustomersBankAccounts(String ID){
+        ArrayList<String> list = new ArrayList<>();
+
+        // Get the customer currencyaccountIDs
+        try {
+            Statement statement = con.createStatement();
+            String sql = "SELECT currencyaccountID FROM bankaccount WHERE accountID='" + ID + "'";
+            ResultSet rs = statement.executeQuery(sql);
+
+            while (rs.next()) {
+                list.add(rs.getString("currencyaccountID"));
+            }
+            rs.close();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            JOptionPane.showMessageDialog(null,"Load Bank Accounts Unsuccessful!");
+        }
+
+        return list;
+    }
 }

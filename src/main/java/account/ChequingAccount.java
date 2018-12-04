@@ -1,10 +1,9 @@
 package account;
 
 
-class ChequingAccount extends AccountImplement {
-
-	ChequingAccount(int id){
-		super(id);
+class ChequingAccount extends AccountImpl {
+	ChequingAccount(String id, boolean flag){
+		super(id, flag);
 	}
 
 	ChequingAccount(String username){

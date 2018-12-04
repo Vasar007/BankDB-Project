@@ -5,6 +5,7 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Date;
 
 
@@ -23,8 +24,8 @@ class Customer extends JFrame implements ActionListener {
     private JTextField textField2;
     private JTextField textField3;
     private JTextField textField4;
+    private JTextField textField5;
     private JTextField textField6;
-    private JTextField textField7;
     private JButton button1;
     private JButton button2;
     private JButton button3;
@@ -34,6 +35,10 @@ class Customer extends JFrame implements ActionListener {
     private JLabel label6;
     private JLabel label8;
     private JLabel label9;
+
+    private String selectUserBankAccount = null;
+    private ArrayList<String> customerBankAccounts;
+
     private ChequingAccount user;
     private IdleListener timer;
 
@@ -44,13 +49,12 @@ class Customer extends JFrame implements ActionListener {
         this.parent = parent;
         timer = new IdleListener(180);
 
+        user = new ChequingAccount(username);
         initialize();
 
         timer.startTimer();
 
-        user = new ChequingAccount(username);
         getUserData();
-
     }
 
     /**
@@ -59,14 +63,22 @@ class Customer extends JFrame implements ActionListener {
     private void getUserData(){
         textField1.setText(user.getName());
         textField2.setText(user.getLastName());
-        textField3.setText(Integer.toString(user.getSIN()));
-        textField4.setText(user.getBirthDate());
-        label6.setText(Integer.toString(user.getBalLeft()));
-        label8.setText(Integer.toString(user.getBalRight()));
-        label9.setText(user.getCurrency());
+        textField3.setText(user.getSIN());
+        textField4.setText(user.getBirthDate().toString());
+        label6.setText("");
+        label8.setText("");
+        label9.setText("");
         last.setText(user.getLastActivity());
-        ID.setText(Integer.toString(user.getID()));
+        ID.setText(user.getID());
+    }
 
+    /**
+     * Retrieves the account information
+     */
+    private void getAccountData(String bankAccount){
+        label6.setText(Integer.toString(user.getBalLeft(bankAccount)));
+        label8.setText(Integer.toString(user.getBalRight(bankAccount)));
+        label9.setText(user.getCurrency(bankAccount));
     }
 
     /**
@@ -80,8 +92,10 @@ class Customer extends JFrame implements ActionListener {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         JPanel infoPanel = new JPanel();
         JPanel balancePanel = new JPanel();
-        infoPanel.setLayout(new GridLayout(5, 1,2,2));
-        balancePanel.setLayout(new GridLayout(4, 1,2,2));
+        JPanel selectPanel = new JPanel();
+        selectPanel.setLayout(new GridLayout(2, 2,1,1));
+        infoPanel.setLayout(new GridLayout(5, 1,1,1));
+        balancePanel.setLayout(new GridLayout(4, 1,1,1));
 
         // Top image
         JPanel topPanel = new JPanel();
@@ -94,16 +108,6 @@ class Customer extends JFrame implements ActionListener {
         topPanel.add(logo);
         topPanel.setBackground(backgroundColor);
         topPanel.setForeground(foregroundColor);
-
-//        // Bottom image
-//        JPanel bottomPanel = new JPanel();
-//        JLabel copyright = new JLabel();
-//        copyright.setHorizontalAlignment(JLabel.LEFT);
-//        ImageIcon icon2 = UserInterface.createImageIcon("images/bottom.png");
-//        copyright.setIcon(icon2);
-//
-//        copyright.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
-//        bottomPanel.add(copyright);
 
         // Logout Button
         JButton logout = new JButton();
@@ -121,13 +125,26 @@ class Customer extends JFrame implements ActionListener {
 
         // Line1 (AccountID)
         JPanel p = new JPanel();
+
+        customerBankAccounts = MySQLConnect.getCustomersBankAccounts(user.getID());
+
+        JComboBox customerBankAccountsList = new JComboBox(customerBankAccounts.toArray());
+        customerBankAccountsList.setBorder(BorderFactory.createTitledBorder(new TitledBorder("Please Select your Bank Account")));
+        customerBankAccountsList.setPreferredSize(new Dimension(300,60));
+//        customerBankAccountsList.setSelectedIndex(customerBankAccounts.size());
+        customerBankAccountsList.setActionCommand("ACCOUNTLIST");
+        customerBankAccountsList.addActionListener(this);
+        selectUserBankAccount = (String) customerBankAccountsList.getSelectedItem();
+
+        selectPanel.add(customerBankAccountsList);
+
         JLabel accID = new JLabel("Account ID: ");
         ID = new JLabel("N/A");
         accID.setFont(font);
         ID.setFont(font);
         p.add(accID);
         p.add(ID);
-        p.add(logout);
+        selectPanel.add(logout);
 
         // Line2 ( name )
         JPanel panel1 = new JPanel();
@@ -219,11 +236,11 @@ class Customer extends JFrame implements ActionListener {
 
         // Deposit Field
         JPanel panel6 = new JPanel();
-        textField6 = new JTextField();
-        textField6.setPreferredSize(new Dimension(200,40));
-        textField6.setFont(font);
-        textField6.setBorder(BorderFactory.createTitledBorder(new TitledBorder("Enter Amount:")));
-        textField6.setForeground(foregroundColor);
+        textField5 = new JTextField();
+        textField5.setPreferredSize(new Dimension(200,40));
+        textField5.setFont(font);
+        textField5.setBorder(BorderFactory.createTitledBorder(new TitledBorder("Enter Amount:")));
+        textField5.setForeground(foregroundColor);
         JButton button6 = new JButton("Deposit");
         button6.setPreferredSize(new Dimension(140,40));
         button6.setFont(font1);
@@ -232,15 +249,15 @@ class Customer extends JFrame implements ActionListener {
         button6.setActionCommand("DEPOSIT");
         button6.addActionListener(this);
         panel6.add(button6);
-        panel6.add(textField6);
+        panel6.add(textField5);
 
         // Withdraw Field
         JPanel panel7 = new JPanel();
-        textField7 = new JTextField();
-        textField7.setPreferredSize(new Dimension(200,40));
-        textField7.setFont(font);
-        textField7.setBorder(BorderFactory.createTitledBorder(new TitledBorder("Enter Amount:")));
-        textField7.setForeground(foregroundColor);
+        textField6 = new JTextField();
+        textField6.setPreferredSize(new Dimension(200,40));
+        textField6.setFont(font);
+        textField6.setBorder(BorderFactory.createTitledBorder(new TitledBorder("Enter Amount:")));
+        textField6.setForeground(foregroundColor);
         JButton button7 = new JButton("Withdraw");
         button7.setPreferredSize(new Dimension(140,40));
         button7.setFont(font1);
@@ -249,7 +266,7 @@ class Customer extends JFrame implements ActionListener {
         button7.setActionCommand("WITHDRAW");
         button7.addActionListener(this);
         panel7.add(button7);
-        panel7.add(textField7);
+        panel7.add(textField6);
 
         // Last Activity Line
         JPanel lastActivity = new JPanel();
@@ -271,12 +288,12 @@ class Customer extends JFrame implements ActionListener {
         balancePanel.add(panel7);
         balancePanel.add(lastActivity);
 
+        midPanel.add(selectPanel);
         midPanel.add(infoPanel);
         midPanel.add(balancePanel);
 
         this.add(topPanel,BorderLayout.PAGE_START);
         this.add(midPanel,BorderLayout.CENTER);
-//        this.add(bottomPanel,BorderLayout.PAGE_END);
     }
 
     @Override
@@ -287,65 +304,89 @@ class Customer extends JFrame implements ActionListener {
 
     /**
      * Handles the events depending on their status code
-     * @param e of type ActionEvent
+     * @param event of type ActionEvent
      */
-    private void eventHandler(ActionEvent e) {
+    private void eventHandler(ActionEvent event) {
         Date date = new Date();
         user.setLastActivity(date.toString());
         last.setText(user.getLastActivity());
 
+        // Event 2 ---> Admin Clicks on the Selection Box and choose account
+        if ("ACCOUNTLIST".equals(event.getActionCommand())) {
+            JComboBox<String> cb = (JComboBox<String>) event.getSource();
 
-        if ("LOGOUT".equals(e.getActionCommand())) {
+            if (event.getSource() instanceof JComboBox) {
+                selectUserBankAccount = (String) cb.getSelectedItem();
+                //System.out.println(Integer.parseInt(selectUserBankAccount));
+                try {
+                    assert selectUserBankAccount != null;
+                    getAccountData(selectUserBankAccount);
+                } catch (Exception e){
+                    System.out.println(e.getMessage());
+                    textField1.setText("");
+                    textField2.setText("");
+                    textField3.setText("");
+                    textField4.setText("");
+                    textField5.setText("");
+                    textField6.setText("");
+                    last.setText("N/A");
+                }
+            }
+        } else if ("LOGOUT".equals(event.getActionCommand())) {
             JOptionPane.showMessageDialog(null,"Logged out successfully!");
 //            System.exit(0);
             UserInterface.close(this);
             parent.setVisible(true);
         }
 
-        if ("NAME".equals(e.getActionCommand())) {
+        else if ("NAME".equals(event.getActionCommand())) {
             boolean isSuccess = user.setName(textField1.getText());
             if (isSuccess) button1.setBackground(successColor);
             else button1.setBackground(failureColor);
         }
 
-        else if ("LASTNAME".equals(e.getActionCommand())) {
+        else if ("LASTNAME".equals(event.getActionCommand())) {
             boolean isSuccess = user.setLastName(textField2.getText());
             if (isSuccess) button2.setBackground(successColor);
             else button2.setBackground(failureColor);
         }
 
-        else if ("SIN".equals(e.getActionCommand())) {
+        else if ("SIN".equals(event.getActionCommand())) {
             try{
-                boolean isSuccess = user.setSIN(Integer.parseInt(textField3.getText()));
+                boolean isSuccess = user.setSIN(textField3.getText());
                 if (isSuccess) button3.setBackground(successColor);
                 else button3.setBackground(failureColor);
-            } catch(NumberFormatException ex){
+            } catch (NumberFormatException e){
+                System.out.println(e.getMessage());
                 JOptionPane.showMessageDialog(null,"Error --> Please Enter an Integer");
                 button3.setBackground(failureColor);
             }
         }
-        else if("DATE".equals(e.getActionCommand())) {
+
+        else if ("DATE".equals(event.getActionCommand())) {
             boolean isSuccess = user.setBirthDate(textField4.getText());
             if (isSuccess) button4.setBackground(successColor);
             else button4.setBackground(failureColor);
         }
 
-        else if ("DEPOSIT".equals(e.getActionCommand())) {
-            try{
-                user.deposit(Integer.parseInt(textField6.getText()));
-            } catch(NumberFormatException ex) {
+        else if ("DEPOSIT".equals(event.getActionCommand())) {
+            try {
+                user.deposit(Integer.parseInt(textField5.getText()), selectUserBankAccount);
+            } catch (NumberFormatException e) {
+                System.out.println(e.getMessage());
                 JOptionPane.showMessageDialog(null,"Error --> Please Enter an Integer");
             }
-            label6.setText(Integer.toString(user.getBalLeft()));
+            label6.setText(Integer.toString(user.getBalLeft(selectUserBankAccount)));
         }
 
-        else if ("WITHDRAW".equals(e.getActionCommand())) {
+        else if ("WITHDRAW".equals(event.getActionCommand())) {
             try {
-                user.withdraw(Integer.parseInt(textField7.getText()));
-            } catch(NumberFormatException ex) {
+                user.withdraw(Integer.parseInt(textField6.getText()), selectUserBankAccount);
+            } catch (NumberFormatException e) {
+                System.out.println(e.getMessage());
                 JOptionPane.showMessageDialog(null,"Error --> Please Enter an Integer( Multiples of 20 )");
             }
-            label6.setText(Integer.toString(user.getBalLeft()));
+            label6.setText(Integer.toString(user.getBalLeft(selectUserBankAccount)));
         }
     }
 

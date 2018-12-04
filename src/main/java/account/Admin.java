@@ -5,6 +5,7 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -12,14 +13,13 @@ import java.util.*;
  * Creates the UI for Admin Panel and listens to the events on that panel.
  */
 class Admin extends JFrame implements ActionListener {
-
     private static final Color backgroundColor = Color.WHITE;
     private static final Color foregroundColor = Color.BLACK;
     private static final Color regularColor = Color.BLUE;
     private static final Font font = new Font("SansSerif", Font.BOLD, 16);
     private static final Font font2 = new Font("SansSerif", Font.BOLD, 22);
     private static final Font font3 = new Font("SansSerif",  Font.ITALIC, 14);
-    private String select = null;
+
     private JTextField textField1;
     private JTextField textField2;
     private JTextField textField3;
@@ -29,9 +29,16 @@ class Admin extends JFrame implements ActionListener {
     private JTextField textField7;
     private JButton button;
     private JLabel last;
-    private int newID;
+    private JComboBox customersListCB;
+    private JComboBox customerBankAccountsList;
+
+    private String selectUserID = null;
+    private String selectUserBankAccount = null;
+
+    private String newID;
     private ChequingAccount user;
-    private ArrayList<String> myList;
+    private ArrayList<String> customersList = new ArrayList<>();
+    private ArrayList<String> customerBankAccounts = new ArrayList<>();
     private IdleListener timer;
 
     private JFrame parent;
@@ -47,24 +54,30 @@ class Admin extends JFrame implements ActionListener {
         timer.startTimer();
 
         // create an ID for the new user
-        newID = createID(myList);
+        newID = createID(customersList);
 
-        user = new ChequingAccount(newID);
+        user = new ChequingAccount(newID, true);
     }
 
     /**
      * Retrieves the user information
      */
-    private void getUserData(int ID){
+    private void getUserData(String ID){
         user.setID(ID);
         textField1.setText(user.getName());
         textField2.setText(user.getLastName());
-        textField3.setText(Integer.toString(user.getSIN()));
-        textField4.setText(user.getBirthDate());
-        textField5.setText(Integer.toString(user.getBalLeft()));
-        textField6.setText(Integer.toString(user.getBalRight()));
-        textField7.setText(user.getCurrency());
+        textField3.setText(user.getSIN());
+        textField4.setText(user.getBirthDate().toString());
         last.setText(user.getLastActivity());
+    }
+
+    /**
+     * Retrieves the account information
+     */
+    private void getAccountData(String bankAccount){
+        textField5.setText(Integer.toString(user.getBalLeft(bankAccount)));
+        textField6.setText(Integer.toString(user.getBalRight(bankAccount)));
+        textField7.setText(user.getCurrency(bankAccount));
     }
 
     /**
@@ -79,8 +92,10 @@ class Admin extends JFrame implements ActionListener {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         JPanel infoPanel = new JPanel();
         JPanel balancePanel = new JPanel();
+        JPanel selectPanel = new JPanel();
         infoPanel.setLayout(new GridLayout(3, 2,10,10));
         balancePanel.setLayout(new GridLayout(1, 3,10,10));
+        selectPanel.setLayout(new GridLayout(2, 1,10,10));
 
         // Top image
         JPanel topPanel = new JPanel();
@@ -93,16 +108,6 @@ class Admin extends JFrame implements ActionListener {
         topPanel.add(logo);
         topPanel.setBackground(backgroundColor);
         topPanel.setForeground(foregroundColor);
-
-        // Bottom image
-//        JPanel bottomPanel = new JPanel();
-//        JLabel copyright = new JLabel();
-//        copyright.setHorizontalAlignment(JLabel.LEFT);
-//        ImageIcon icon2 = UserInterface.createImageIcon("images/bottom.png");
-//        copyright.setIcon(icon2);
-//
-//        copyright.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
-//        bottomPanel.add(copyright);
 
         // Logout Button
         JButton logout = new JButton();
@@ -119,40 +124,61 @@ class Admin extends JFrame implements ActionListener {
         logout.addActionListener(this);
 
         // Delete Button
-        JButton delete = new JButton();
+        JButton deleteCustomer = new JButton();
         ImageIcon d1 = UserInterface.createImageIcon("images/delete.png");
         ImageIcon d2 = UserInterface.createImageIcon("images/delete2.png");
-        delete.setIcon(d1);
-        delete.setPressedIcon(d2);
-        delete.setBackground(backgroundColor);
-        delete.setBorderPainted(false);
-        delete.setContentAreaFilled(false);
-        delete.setFocusPainted(false);
-        delete.setSize(new Dimension(10, 10));
-        delete.setActionCommand("DELETE");
-        delete.addActionListener(this);
+        deleteCustomer.setIcon(d1);
+        deleteCustomer.setPressedIcon(d2);
+        deleteCustomer.setBackground(backgroundColor);
+        deleteCustomer.setBorderPainted(false);
+        deleteCustomer.setContentAreaFilled(false);
+        deleteCustomer.setFocusPainted(false);
+        deleteCustomer.setSize(new Dimension(10, 10));
+        deleteCustomer.setActionCommand("DELETECUSTOMER");
+        deleteCustomer.addActionListener(this);
+
+        JButton deleteAccount = new JButton();
+        deleteAccount.setIcon(d1);
+        deleteAccount.setPressedIcon(d2);
+        deleteAccount.setBackground(backgroundColor);
+        deleteAccount.setBorderPainted(false);
+        deleteAccount.setContentAreaFilled(false);
+        deleteAccount.setFocusPainted(false);
+        deleteAccount.setSize(new Dimension(10, 10));
+        deleteAccount.setActionCommand("DELETEACCOUNT");
+        deleteAccount.addActionListener(this);
 
         // Remaining Time
 
-
         // List Selection of Accounts in the database
         JPanel p = new JPanel();
-
-        myList= MySQLConnect.getCustomers();
-
-        JComboBox list = new JComboBox(myList.toArray());
-        list.addItem("-- Create New --");
-
-        list.setBorder(BorderFactory.createTitledBorder(new TitledBorder("Please Select " +
-                "a Customer to Edit")));
-        list.setPreferredSize(new Dimension(300,60));
-        list.setSelectedIndex(myList.size());
-        list.setActionCommand("LIST");
-        list.addActionListener(this);
-        select = (String) list.getSelectedItem();
-
-        p.add(list);
         p.add(logout);
+
+        customersList = MySQLConnect.getCustomers();
+
+        customersListCB = new JComboBox(customersList.toArray());
+        customersListCB.addItem("-- Create New --");
+
+        customersListCB.setBorder(BorderFactory.createTitledBorder(new TitledBorder("Please Select a Customer to Edit")));
+        customersListCB.setPreferredSize(new Dimension(300,60));
+        customersListCB.setSelectedIndex(customersList.size());
+        customersListCB.setActionCommand("CUSTOMERLIST");
+        customersListCB.addActionListener(this);
+        selectUserID = (String) customersListCB.getSelectedItem();
+
+        selectPanel.add(customersListCB);
+
+        customerBankAccountsList = new JComboBox();
+        customerBankAccountsList.addItem("-- Create New --");
+
+        customerBankAccountsList.setBorder(BorderFactory.createTitledBorder(new TitledBorder("Please Select a Customer Bank Account to Edit")));
+        customerBankAccountsList.setPreferredSize(new Dimension(300,60));
+        customerBankAccountsList.setSelectedIndex(0);
+        customerBankAccountsList.setActionCommand("ACCOUNTLIST");
+        customerBankAccountsList.addActionListener(this);
+        selectUserBankAccount = (String) customerBankAccountsList.getSelectedItem();
+
+        selectPanel.add(customerBankAccountsList);
 
         // Line2 ( name )
         JPanel panel1 = new JPanel();
@@ -214,6 +240,8 @@ class Admin extends JFrame implements ActionListener {
 
         // SAVE Button
         JPanel panel4 = new JPanel();
+        panel4.setLayout(new GridLayout(1, 3,5,5));
+
         button = new JButton();
         ImageIcon s1 = UserInterface.createImageIcon("images/save.png");
         ImageIcon s2 = UserInterface.createImageIcon("images/save2.png");
@@ -228,7 +256,8 @@ class Admin extends JFrame implements ActionListener {
         button.addActionListener(this);
 
         panel4.add(button);
-        panel4.add(delete);
+        panel4.add(deleteCustomer);
+        panel4.add(deleteAccount);
 
         // Last Activity Line
         JPanel lastActivity = new JPanel();
@@ -252,6 +281,7 @@ class Admin extends JFrame implements ActionListener {
         bothPanel.add(panel4);
         bothPanel.add(lastActivity);
 
+        midPanel.add(selectPanel);
         midPanel.add(infoPanel);
         midPanel.add(balancePanel);
         midPanel.add(bothPanel);
@@ -259,7 +289,6 @@ class Admin extends JFrame implements ActionListener {
 
         this.add(topPanel,BorderLayout.PAGE_START);
         this.add(midPanel,BorderLayout.CENTER);
-//        this.add(bottomPanel,BorderLayout.PAGE_END);
     }
 
     /**
@@ -267,24 +296,26 @@ class Admin extends JFrame implements ActionListener {
      * @param list of type of ArrayList<String>
      * @return ID of type int
      */
-    private static int createID(ArrayList<String> list) {
-        Random random = new Random();
-        int newID = random.nextInt(1000000);
+    private static String createID(ArrayList<String> list) {
+        ArrayList<Long> newList = new ArrayList<>();
 
-        ArrayList<Integer> newList = new ArrayList<>();
-
+        Long max = 0L;
         for (String s : list) {
             try {
-                newList.add(Integer.parseInt(s));
+                Long temp = Long.parseLong(s);
+                if (temp > max) max = temp;
+                newList.add(temp);
             } catch (NumberFormatException nfe) {
                 System.out.println("Error -> Could not parse " + nfe);
             }
         }
+
+        long newID = max + 1;
         while (newList.contains(newID)) {
-            newID = random.nextInt(1000000);
+            newID += 1;
         }
 
-       return newID;
+       return Long.toString(newID);
     }
 
     /**
@@ -293,40 +324,87 @@ class Admin extends JFrame implements ActionListener {
      * @throws Exception
      */
     private void updateInfo(ChequingAccount user) throws Exception {
-        Boolean[] isSuccess = new Boolean[7];
+        Boolean[] isSuccess = new Boolean[4];
 
         isSuccess[0] = user.setName(textField1.getText());
         isSuccess[1] = user.setLastName(textField2.getText());
 
         try {
-            isSuccess[2] = user.setSIN(Integer.parseInt(textField3.getText()));
-        } catch (Exception ex) {
+            isSuccess[2] = user.setSIN(textField3.getText());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
             JOptionPane.showMessageDialog(null, "Error --> Please Enter a valid SIN");
         }
 
         isSuccess[3] = user.setBirthDate(textField4.getText());
-
-        try {
-            isSuccess[4] = user.setBalLeft(Integer.parseInt(textField5.getText()));
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(null, "Error --> Please Enter an Integer");
-        }
-
-        try {
-            isSuccess[5] = user.setBalRight(Integer.parseInt(textField6.getText()));
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(null, "Error --> Please Enter an Integer");
-        }
-
-        isSuccess[6] = user.setCurrency(textField7.getText());
-
 
         for (Boolean element : isSuccess) {
             if (!element) {
                 throw new Exception();
             }
         }
-        JOptionPane.showMessageDialog(null, "New Account --> "+ user.getID() + " Added !");
+        JOptionPane.showMessageDialog(null, "New Customer Account Info --> "+ user.getID() + " Added!");
+    }
+
+    /**
+     * Updates the current user's info to be displayed
+     * @param user of type ChequingAccount
+     * @throws Exception
+     */
+    private void updateAccount(ChequingAccount user) throws Exception {
+        Boolean[] isSuccess = new Boolean[3];
+
+        try {
+            isSuccess[0] = user.setBalLeft(Integer.parseInt(textField5.getText()), selectUserBankAccount);
+        } catch (NumberFormatException e) {
+            System.out.println(e.getMessage());
+            JOptionPane.showMessageDialog(null, "Error --> Please Enter an Integer");
+        }
+
+        try {
+            isSuccess[1] = user.setBalRight(Integer.parseInt(textField6.getText()), selectUserBankAccount);
+        } catch (NumberFormatException e) {
+            System.out.println(e.getMessage());
+            JOptionPane.showMessageDialog(null, "Error --> Please Enter an Integer");
+        }
+
+        isSuccess[2] = user.setCurrency(textField7.getText(), selectUserBankAccount);
+
+        for (Boolean element : isSuccess) {
+            if (!element) {
+                throw new Exception();
+            }
+        }
+        JOptionPane.showMessageDialog(null, "New Customer Account --> "+ user.getID() + " Added!");
+    }
+
+    public void createBankAccount(String newID){
+        if (customerBankAccounts.isEmpty())
+            customerBankAccounts.add(newID + "00");
+        String newCurrencyAccountID = createID(customerBankAccounts);
+
+        int balleft = 0;
+        int balright = 0;
+
+        try {
+            balleft = Integer.parseInt(textField5.getText());
+        } catch (NumberFormatException e) {
+            System.out.println(e.getMessage());
+            JOptionPane.showMessageDialog(null, "Error --> Please Enter an Integer in left field!");
+        }
+
+        try {
+            balright = Integer.parseInt(textField6.getText());
+        } catch (NumberFormatException e) {
+            System.out.println(e.getMessage());
+            JOptionPane.showMessageDialog(null, "Error --> Please Enter an Integer in right field!");
+        }
+
+        String currency = textField7.getText();
+
+        user.createBankAccount(newID, newCurrencyAccountID, balleft, balright, currency);
+
+        JOptionPane.showMessageDialog(null, "New Bank Account --> "+ newCurrencyAccountID + " Added!");
     }
 
     @Override
@@ -338,78 +416,153 @@ class Admin extends JFrame implements ActionListener {
 
     /**
      * Handles the events depending on their status code
-     * @param e of type ActionEvent
+     * @param event of type ActionEvent
      */
     @SuppressWarnings("unchecked")
-    private void eventHandler(ActionEvent e){
-        JComboBox<String> cb;
+    private void eventHandler(ActionEvent event){
+        // Event 1 ---> Admin Clicks on the Selection Box and choose customer
+        if ("CUSTOMERLIST".equals(event.getActionCommand())) {
+            JComboBox<String> cb = (JComboBox<String>) event.getSource();
 
-        // Event 1 ---> User Clicks on the Selection Box
-        if ("LIST".equals(e.getActionCommand())) {
-            cb = (JComboBox<String>) e.getSource();
-            button.setBackground(regularColor);
-
-            if (e.getSource() instanceof JComboBox) {
-                select = (String) cb.getSelectedItem();
-                //System.out.println(Integer.parseInt(select));
+            if (event.getSource() instanceof JComboBox) {
+                selectUserID = (String) cb.getSelectedItem();
+                //System.out.println(Integer.parseInt(selectUserID));
                 try {
-                    getUserData(Integer.parseInt(select));
-                } catch (Exception ex){
+                    if (selectUserID != null) {
+                        getUserData(selectUserID);
+
+                        customerBankAccounts = MySQLConnect.getCustomersBankAccounts(user.getID());
+                        customerBankAccountsList.removeAllItems();
+                        for (String item : customerBankAccounts) {
+                            customerBankAccountsList.addItem(item);
+                        }
+                        customerBankAccountsList.addItem("-- Create New --");
+                        customerBankAccountsList.setSelectedIndex(0);
+                    }
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
                     textField1.setText("");
                     textField2.setText("");
                     textField3.setText("");
                     textField4.setText("");
-                    textField5.setText("");
-                    textField6.setText("");
-                    textField7.setText("");
                     last.setText("N/A");
                 }
             }
         }
 
-        // Event 2 - Admin clicks on SAVE button
-        try {
-            if ("SAVE".equals(e.getActionCommand())) {
+        // Event 2 ---> Admin Clicks on the Selection Box and choose account
+        if ("ACCOUNTLIST".equals(event.getActionCommand())) {
+            button.setBackground(regularColor);
 
-                if (select.equals("-- Create New --")) {
-                    ChequingAccount newUser = new ChequingAccount(newID);
-                    newUser.setID(newID);
-                    updateInfo(newUser);
-                    newUser.createAccount(newID);
-                }
-                else {
-                    updateInfo(user);
+            if (event.getSource() instanceof JComboBox) {
+                selectUserBankAccount = (String) customerBankAccountsList.getSelectedItem();
+                //System.out.println(Integer.parseInt(selectUserBankAccount));
+                try {
+                    if (selectUserBankAccount != null) {
+                        getAccountData(selectUserBankAccount);
+                    }
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                    textField5.setText("");
+                    textField6.setText("");
+                    textField7.setText("");
                 }
             }
-        } catch(Exception ex){
+        }
+
+        // Event 3 - Admin clicks on SAVE button
+        try {
+            if ("SAVE".equals(event.getActionCommand())) {
+                if (selectUserID.equals("-- Create New --")) {
+                    ChequingAccount newUser = new ChequingAccount(newID, true);
+
+                    newUser.name = textField1.getText();
+                    newUser.lastName = textField2.getText();
+                    newUser.SIN = textField3.getText();
+                    newUser.ID = newID;
+                    newUser.lastActivity = "None";
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                    java.util.Date parsed = format.parse(textField4.getText());
+                    newUser.birthDate = new java.sql.Date(parsed.getTime());
+
+                    newUser.createAccount(newID);
+                    updateInfo(newUser);
+                    createBankAccount(newID);
+
+                    customersList = MySQLConnect.getCustomers();
+
+                    customersListCB.removeAllItems();
+                    for (String item : customersList) {
+                        customersListCB.addItem(item);
+                    }
+                    customersListCB.addItem("-- Create New --");
+                    customersListCB.setSelectedIndex(0);
+
+                } else if (selectUserBankAccount.equals("-- Create New --")) {
+                    createBankAccount(user.getID());
+                } else {
+                    updateInfo(user);
+                    updateAccount(user);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
             JOptionPane.showMessageDialog(null, "Error --> Cannot Write to the Database");
         }
 
-        //Event 3 - Admin presses on Logout button
-        if("LOGOUT".equals(e.getActionCommand())){
+        //Event 4 - Admin presses on Logout button
+        if ("LOGOUT".equals(event.getActionCommand())){
             JOptionPane.showMessageDialog(null,"Logged out successfully!");
 //            System.exit(0);
             UserInterface.close(this);
             parent.setVisible(true);
         }
 
-        //Event 4 - Admin presses on Delete button
-
-        if ("DELETE".equals(e.getActionCommand())) {
-            switch (select) {
+        //Event 5 - Admin presses on Delete Customer button
+        if ("DELETECUSTOMER".equals(event.getActionCommand())) {
+            switch (selectUserID) {
                 case "-- Create New --":
                     JOptionPane.showMessageDialog(null, "No User Selected!");
                     break;
                 case "0":
-                    JOptionPane.showMessageDialog(null, "Cannot Delete Admin!!");
+                    JOptionPane.showMessageDialog(null, "Cannot Delete Admin!");
                     break;
                 default:
-                    int userID = user.getID();
+                    String userID = user.getID();
                     int response = JOptionPane.showConfirmDialog(null, "Delete " + user.findUserName(userID) + " ?");
 
                     if (response == JOptionPane.OK_OPTION) {
                         JOptionPane.showMessageDialog(null, "ID "+ userID + " Has Been Successfully Deleted!");
                         user.deleteAccount(user.getID());
+
+                        customersList = MySQLConnect.getCustomers();
+
+                        customersListCB.removeAllItems();
+                        for (String item : customersList) {
+                            customersListCB.addItem(item);
+                        }
+                        customersListCB.addItem("-- Create New --");
+                        customersListCB.setSelectedIndex(0);
+                    }
+                    break;
+            }
+        }
+
+        //Event 6 - Admin presses on Delete Account button
+        if ("DELETEACCOUNT".equals(event.getActionCommand())) {
+            switch (selectUserBankAccount) {
+                case "-- Create New --":
+                    JOptionPane.showMessageDialog(null, "No Account Selected!");
+                    break;
+                case "0":
+                    JOptionPane.showMessageDialog(null, "Cannot Delete Admin!");
+                    break;
+                default:
+                    int response = JOptionPane.showConfirmDialog(null, "Delete Customer Account " + selectUserBankAccount + " ?");
+
+                    if (response == JOptionPane.OK_OPTION) {
+                        JOptionPane.showMessageDialog(null, "ID "+ selectUserBankAccount + " Has Been Successfully Deleted!");
+                        user.deleteBankAccount(selectUserBankAccount);
                     }
                     break;
             }
