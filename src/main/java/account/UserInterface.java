@@ -16,23 +16,26 @@ import java.sql.SQLException;
  * The User Interface of the Application, manages the login process, contains the main method..
  */
 class UserInterface extends JPanel implements ActionListener {
-
-    private JLabel picture;
-    private JPasswordField pw;
-    private JFormattedTextField username;
-    private JProgressBar progress;
     private static final Color backgroundColor = Color.WHITE;
     private static final Color foregroundColor = Color.BLACK;
-    private int counter = 0;
-    private int i = 0;
-    private String select = null;
+
     private static final int maxNumberOfTries = 5;
+
     private static JFrame frame;
+    private JLabel picture;
+    private JPasswordField passwordField;
+    private JFormattedTextField username;
+    private JProgressBar progress;
     private JLabel status;
     private ImageIcon online;
     private ImageIcon offline;
 
+    private int counter = 0;
+    private int i = 0;
+    private String select = null;
+
     private static Connection con = null;
+
 
     private UserInterface() {
         super(new BorderLayout(1,1));
@@ -100,16 +103,16 @@ class UserInterface extends JPanel implements ActionListener {
 
 
         // Set up the password field
-        pw = new JPasswordField(10);
-        pw.setHorizontalAlignment(SwingConstants.CENTER);
-        pw.setMinimumSize(new Dimension(400, 20));
-        pw.setBorder(BorderFactory.createTitledBorder(new TitledBorder("Password:")));
-        pw.setBackground(backgroundColor);
-        pw.setForeground(foregroundColor);
-        pw.setSelectedTextColor(backgroundColor);
-        pw.setSelectionColor(foregroundColor);
-        pw.setActionCommand("ENTER");
-        pw.addActionListener(this);
+        passwordField = new JPasswordField(10);
+        passwordField.setHorizontalAlignment(SwingConstants.CENTER);
+        passwordField.setMinimumSize(new Dimension(400, 20));
+        passwordField.setBorder(BorderFactory.createTitledBorder(new TitledBorder("Password:")));
+        passwordField.setBackground(backgroundColor);
+        passwordField.setForeground(foregroundColor);
+        passwordField.setSelectedTextColor(backgroundColor);
+        passwordField.setSelectionColor(foregroundColor);
+        passwordField.setActionCommand("ENTER");
+        passwordField.addActionListener(this);
 
         //Set up the username field
         username = new JFormattedTextField();
@@ -153,7 +156,7 @@ class UserInterface extends JPanel implements ActionListener {
         authPanel.add(list);
         authPanel.add(pad1);
         authPanel.add(username,BOTTOM_ALIGNMENT);
-        authPanel.add(pw,BOTTOM_ALIGNMENT);
+        authPanel.add(passwordField,BOTTOM_ALIGNMENT);
         rightPanel.add(status,LEFT_ALIGNMENT);
         rightPanel.add(picture, LEFT_ALIGNMENT);
         rightPanel.add(login,LEFT_ALIGNMENT);
@@ -245,7 +248,7 @@ class UserInterface extends JPanel implements ActionListener {
                      cannotLogin();
                  }
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                e.printStackTrace();
                 JOptionPane.showMessageDialog(null, "Error --> Login Error..");
             }
         }
@@ -300,14 +303,14 @@ class UserInterface extends JPanel implements ActionListener {
             String sql = "SELECT * FROM  account WHERE username=? AND password=?";
             PreparedStatement pst = con.prepareStatement(sql);
             pst.setString(1, username.getText());
-            pst.setString(2, String.valueOf(pw.getPassword()));
+            pst.setString(2, String.valueOf(passwordField.getPassword()));
             ResultSet rs = pst.executeQuery();
 
             if (rs.next())
                 return true;
 
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                e.printStackTrace();
                 JOptionPane.showMessageDialog(null, "Error --> System is Offline..");
             }
 
@@ -356,8 +359,7 @@ class UserInterface extends JPanel implements ActionListener {
             @Override
             public void windowClosing(WindowEvent e) {
                 // Ask for confirmation before terminating the program.
-                int option = JOptionPane.showConfirmDialog(
-                        frame,
+                int option = JOptionPane.showConfirmDialog(frame,
                         "Are you sure you want to close the application?",
                         "Close Confirmation",
                         JOptionPane.YES_NO_OPTION,

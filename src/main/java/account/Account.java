@@ -34,10 +34,11 @@ public interface Account {
 	boolean withdraw(int amount, String currencyAccountID);
 	boolean deposit(int amount, String currencyAccountID);
 	
-	boolean createAccount(String ID);
+	boolean createAccount();
 	boolean deleteAccount(String accountID);
 
-	boolean createBankAccount(String accountID, String newCurrencyAccountID, int balleft, int balright,
+	boolean createBankAccount(String newCurrencyAccountID, int balleft, int balright,
 						      String currency);
+	void updateBankAccount();
 	boolean deleteBankAccount(String currencyAccountID);
 }

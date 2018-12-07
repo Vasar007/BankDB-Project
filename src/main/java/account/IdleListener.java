@@ -13,10 +13,10 @@ import java.awt.event.ActionListener;
  * The timer is being reset at every AWT event.
  */
 class IdleListener implements AWTEventListener, ActionListener {
-
     private Timer timer;
     private int timeoutSeconds;
     private int counter=0;
+
 
     /**
      * Creates a new timer and registers itself as action listener.
@@ -32,7 +32,7 @@ class IdleListener implements AWTEventListener, ActionListener {
      */
     public void eventDispatched(AWTEvent event) {
         timer.restart();
-        counter=0;
+        counter = 0;
     }
 
     /**

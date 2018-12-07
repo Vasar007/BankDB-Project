@@ -1,16 +1,14 @@
 package account;
 
 import javax.swing.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 
 
 class MySQLConnect {
     static boolean status;
     private static Connection con;
+
 
     /**
      * Creates a connection and returns for further use
@@ -41,7 +39,7 @@ class MySQLConnect {
             // Connection error
             status = false;
             System.out.println("Error occurred during connection to database!");
-            System.out.println(e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
@@ -52,19 +50,17 @@ class MySQLConnect {
      */
     static ArrayList<String> getCustomers(){
         ArrayList<String> list = new ArrayList<>();
+        String sql = "SELECT accountID FROM bankdb";
 
         // Get the accountIDs
-        try {
-            Statement statement = con.createStatement();
-            String sql = "SELECT accountID FROM bankdb";
-            ResultSet rs = statement.executeQuery(sql);
-
-            while (rs.next()) {
-                list.add(rs.getString("accountID"));
+        try (Statement statement = con.createStatement()) {
+            try (ResultSet rs = statement.executeQuery(sql)) {
+                while (rs.next()) {
+                    list.add(rs.getString("accountID"));
+                }
             }
-            rs.close();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        } catch (SQLException e) {
+            e.printStackTrace();
             JOptionPane.showMessageDialog(null,"Load Customers Unsuccessful!");
         }
 
@@ -77,19 +73,19 @@ class MySQLConnect {
      */
     static ArrayList<String> getCustomersBankAccounts(String ID){
         ArrayList<String> list = new ArrayList<>();
+        String sql = "SELECT currencyaccountID FROM bankaccount WHERE accountID=?";
 
         // Get the customer currencyaccountIDs
-        try {
-            Statement statement = con.createStatement();
-            String sql = "SELECT currencyaccountID FROM bankaccount WHERE accountID='" + ID + "'";
-            ResultSet rs = statement.executeQuery(sql);
+        try (PreparedStatement statement = con.prepareStatement(sql)) {
+            statement.setString(1, ID);
 
-            while (rs.next()) {
-                list.add(rs.getString("currencyaccountID"));
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    list.add(rs.getString("currencyaccountID"));
+                }
             }
-            rs.close();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        } catch (SQLException e) {
+            e.printStackTrace();
             JOptionPane.showMessageDialog(null,"Load Bank Accounts Unsuccessful!");
         }
 
