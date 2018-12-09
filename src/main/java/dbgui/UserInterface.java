@@ -19,8 +19,6 @@ class UserInterface extends JPanel implements ActionListener {
     private static final Color backgroundColor = Color.WHITE;
     private static final Color foregroundColor = Color.BLACK;
 
-    private static final int maxNumberOfTries = 5;
-
     private static JFrame frame;
     private JLabel picture;
     private JPasswordField passwordField;
@@ -30,7 +28,6 @@ class UserInterface extends JPanel implements ActionListener {
     private ImageIcon online;
     private ImageIcon offline;
 
-    private int counter = 0;
     private int i = 0;
     private String select = null;
 
@@ -216,7 +213,7 @@ class UserInterface extends JPanel implements ActionListener {
             }
 
             try {
-                 if (isLoginCorrect() && counter <= maxNumberOfTries ) {
+                 if (isLoginCorrect()) {
                      progressBar(true);
                      // If admin is logging in
                      if (select.equals("Admin Login") && username.getText().equals("admin")) {
@@ -256,19 +253,9 @@ class UserInterface extends JPanel implements ActionListener {
      * Login Failure
      */
     private void cannotLogin() {
-        counter++;
-
-        if (counter == maxNumberOfTries) {
-            counter = 0;
-            JOptionPane.showMessageDialog(this,
-                    "Access Denied !(" + (counter) + " Remaining)");
-            System.exit(-1);
-        }
         progressBar(false);
         JOptionPane.showMessageDialog(this,
-                "Invalid entry. Try again.(" + (maxNumberOfTries - counter) + " Remaining)",
-                "Error Message",
-                JOptionPane.ERROR_MESSAGE);
+                "Invalid entry. Try again.", "Error Message", JOptionPane.ERROR_MESSAGE);
     }
 
     /**
