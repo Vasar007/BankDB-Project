@@ -1,10 +1,11 @@
-package account;
+package dbgui;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.List;
 
@@ -18,7 +19,6 @@ class Admin extends JFrame implements ActionListener {
     private static final Color regularColor = Color.BLUE;
 
     private static final Font sansSerifBoldBig = new Font("SansSerif", Font.BOLD, 16);
-    private static final Font sansSerifBoldLarge = new Font("SansSerif", Font.BOLD, 22);
     private static final Font sansSerifItalic = new Font("SansSerif",  Font.ITALIC, 14);
 
     private static final List<String> availableCurrency = Arrays.asList("USD", "EUR", "RUB", "RUPI", "CAD", "GBP",
@@ -28,8 +28,7 @@ class Admin extends JFrame implements ActionListener {
     private JTextField lastNameTextField;
     private JTextField SINTextField;
     private JTextField birthDateTextField;
-    private JTextField balLeftTextField;
-    private JTextField balRightTextField;
+    private JTextField balanceTextField;
     private JComboBox<String> currencyCB;
     private JButton saveButton;
     private JLabel lastActivityLabel;
@@ -63,7 +62,8 @@ class Admin extends JFrame implements ActionListener {
         nameTextField.setText(user.getName());
         lastNameTextField.setText(user.getLastName());
         SINTextField.setText(user.getSIN());
-        birthDateTextField.setText(user.getBirthDate().toString());
+        if (user.getBirthDate() != null) birthDateTextField.setText(user.getBirthDate().toString());
+        else birthDateTextField.setText("");
         lastActivityLabel.setText(user.getLastActivity());
     }
 
@@ -72,8 +72,7 @@ class Admin extends JFrame implements ActionListener {
      */
     private void getAccountData(String bankAccount) {
         user.updateBankAccount();
-        balLeftTextField.setText(Integer.toString(user.getBalLeft(bankAccount)));
-        balRightTextField.setText(Integer.toString(user.getBalRight(bankAccount)));
+        balanceTextField.setText(user.getBalance(bankAccount).toString());
         currencyCB.setSelectedIndex(availableCurrency.indexOf(user.getCurrency(bankAccount)));
     }
 
@@ -148,8 +147,8 @@ class Admin extends JFrame implements ActionListener {
         // Remaining Time
 
         // List Selection of Accounts in the database
-        JPanel p = new JPanel();
-        p.add(logout);
+        JPanel selectionAccountsPanel = new JPanel();
+        selectionAccountsPanel.add(logout);
 
         customersList = MySQLConnect.getCustomers();
 
@@ -158,7 +157,7 @@ class Admin extends JFrame implements ActionListener {
 
         customersListCB.setBorder(BorderFactory.createTitledBorder(new TitledBorder("Please Select a Customer to Edit")));
         customersListCB.setPreferredSize(new Dimension(300,60));
-        customersListCB.setSelectedIndex(customersList.size() - 1);
+        customersListCB.setSelectedIndex(customersList.size());
         customersListCB.setActionCommand("CUSTOMERLIST");
         customersListCB.addActionListener(this);
         selectUserID = (String) customersListCB.getSelectedItem();
@@ -178,7 +177,7 @@ class Admin extends JFrame implements ActionListener {
         selectPanel.add(customerBankAccountsList);
 
         // Line2 ( name )
-        JPanel panel1 = new JPanel();
+        JPanel namePanel = new JPanel();
         nameTextField = new JTextField();
         nameTextField.setPreferredSize(new Dimension(200,40));
         nameTextField.setFont(sansSerifBoldBig);
@@ -191,11 +190,11 @@ class Admin extends JFrame implements ActionListener {
         lastNameTextField.setFont(sansSerifBoldBig);
         lastNameTextField.setBorder(BorderFactory.createTitledBorder(new TitledBorder("Last Name:")));
         lastNameTextField.setForeground(foregroundColor);
-        panel1.add(nameTextField);
-        panel1.add(lastNameTextField);
+        namePanel.add(nameTextField);
+        namePanel.add(lastNameTextField);
 
         // Line4 ( Social Insurance Number )
-        JPanel panel2 = new JPanel();
+        JPanel SINPanel = new JPanel();
         SINTextField = new JTextField();
         SINTextField.setPreferredSize(new Dimension(200,40));
         SINTextField.setFont(sansSerifBoldBig);
@@ -208,26 +207,17 @@ class Admin extends JFrame implements ActionListener {
         birthDateTextField.setFont(sansSerifBoldBig);
         birthDateTextField.setBorder(BorderFactory.createTitledBorder(new TitledBorder("Birth Date:")));
         birthDateTextField.setForeground(foregroundColor);
-        panel2.add(SINTextField);
-        panel2.add(birthDateTextField);
+        SINPanel.add(SINTextField);
+        SINPanel.add(birthDateTextField);
 
         // Balance Field
-        JPanel panel3 = new JPanel();
-        balLeftTextField = new JTextField();
-        balLeftTextField.setPreferredSize(new Dimension(150,40));
-        balLeftTextField.setFont(sansSerifBoldBig);
-        balLeftTextField.setHorizontalAlignment(SwingConstants.RIGHT);
-        balLeftTextField.setBorder(BorderFactory.createTitledBorder(new TitledBorder("Balance:")));
-        balLeftTextField.setForeground(foregroundColor);
-
-        JLabel dot = new JLabel(".");
-        dot.setFont(sansSerifBoldLarge);
-
-        balRightTextField = new JTextField();
-        balRightTextField.setPreferredSize(new Dimension(100,40));
-        balRightTextField.setFont(sansSerifBoldBig);
-        balRightTextField.setBorder(BorderFactory.createTitledBorder(new TitledBorder("Balance:")));
-        balRightTextField.setForeground(foregroundColor);
+        JPanel balanceField = new JPanel();
+        balanceTextField = new JTextField();
+        balanceTextField.setPreferredSize(new Dimension(250,50));
+        balanceTextField.setFont(sansSerifBoldBig);
+        balanceTextField.setHorizontalAlignment(SwingConstants.RIGHT);
+        balanceTextField.setBorder(BorderFactory.createTitledBorder(new TitledBorder("Balance:")));
+        balanceTextField.setForeground(foregroundColor);
 
         currencyCB = new JComboBox(availableCurrency.toArray());
         currencyCB.setPreferredSize(new Dimension(150,50));
@@ -236,14 +226,12 @@ class Admin extends JFrame implements ActionListener {
         currencyCB.setBorder(BorderFactory.createTitledBorder(new TitledBorder("Currency:")));
         currencyCB.setForeground(foregroundColor);
 
-        panel3.add(balLeftTextField);
-        panel3.add(dot);
-        panel3.add(balRightTextField);
-        panel3.add(currencyCB);
+        balanceField.add(balanceTextField);
+        balanceField.add(currencyCB);
 
         // SAVE Button
-        JPanel panel4 = new JPanel();
-        panel4.setLayout(new GridLayout(1, 3,5,5));
+        JPanel saveButtonPanel = new JPanel();
+        saveButtonPanel.setLayout(new GridLayout(1, 3,5,5));
 
         saveButton = new JButton();
         ImageIcon s1 = UserInterface.createImageIcon("images/save.png");
@@ -258,31 +246,31 @@ class Admin extends JFrame implements ActionListener {
         saveButton.setActionCommand("SAVE");
         saveButton.addActionListener(this);
 
-        panel4.add(saveButton);
-        panel4.add(deleteCustomer);
-        panel4.add(deleteAccount);
+        saveButtonPanel.add(saveButton);
+        saveButtonPanel.add(deleteCustomer);
+        saveButtonPanel.add(deleteAccount);
 
         // Last Activity Line
-        JPanel lastActivity = new JPanel();
-        JLabel la = new JLabel("Last Activity: ");
-        la.setFont(sansSerifItalic);
+        JPanel lastActivityFiledPanel = new JPanel();
+        JLabel lastActivityTitleLabel = new JLabel("Last Activity: ");
+        lastActivityTitleLabel.setFont(sansSerifItalic);
         lastActivityLabel = new JLabel("N/A");
         lastActivityLabel.setFont(sansSerifItalic);
-        lastActivity.add(la);
-        lastActivity.add(lastActivityLabel);
+        lastActivityFiledPanel.add(lastActivityTitleLabel);
+        lastActivityFiledPanel.add(lastActivityLabel);
 
         JPanel midPanel = new JPanel();
         JPanel bothPanel = new JPanel();
         bothPanel.setLayout(new GridLayout(2,1));
 
-        infoPanel.add(p);
-        infoPanel.add(panel1);
-        infoPanel.add(panel2);
+        infoPanel.add(selectionAccountsPanel);
+        infoPanel.add(namePanel);
+        infoPanel.add(SINPanel);
 
-        balancePanel.add(panel3);
+        balancePanel.add(balanceField);
 
-        bothPanel.add(panel4);
-        bothPanel.add(lastActivity);
+        bothPanel.add(saveButtonPanel);
+        bothPanel.add(lastActivityFiledPanel);
 
         midPanel.add(selectPanel);
         midPanel.add(infoPanel);
@@ -299,7 +287,7 @@ class Admin extends JFrame implements ActionListener {
      * @param list of type of ArrayList<String>
      * @return ID of type int
      */
-    private static String createID(ArrayList<String> list) {
+    public static String createID(List<String> list) {
         ArrayList<Long> newList = new ArrayList<>();
 
         Long max = 0L;
@@ -324,7 +312,6 @@ class Admin extends JFrame implements ActionListener {
     /**
      * Updates the current user's info to be displayed
      * @param user of type ChequingAccount
-     * @throws Exception
      */
     private void updateInfo(ChequingAccount user) throws Exception {
         Boolean[] isSuccess = new Boolean[4];
@@ -346,28 +333,20 @@ class Admin extends JFrame implements ActionListener {
     /**
      * Updates the current user's info to be displayed
      * @param user of type ChequingAccount
-     * @throws Exception
      */
     private void updateAccount(ChequingAccount user) throws Exception {
-        Boolean[] isSuccess = new Boolean[3];
+        Boolean[] isSuccess = new Boolean[2];
 
         try {
-            isSuccess[0] = user.setBalLeft(Integer.parseInt(balLeftTextField.getText()), selectUserBankAccount);
+            isSuccess[0] = user.setBalance(new BigDecimal(balanceTextField.getText()), selectUserBankAccount);
         } catch (NumberFormatException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Error --> Please Enter an Integer");
-        }
-
-        try {
-            isSuccess[1] = user.setBalRight(Integer.parseInt(balRightTextField.getText()), selectUserBankAccount);
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Error --> Please Enter an Integer");
+            JOptionPane.showMessageDialog(null, "Error --> Please Enter a Valid Number");
         }
 
         String currency = (String) currencyCB.getSelectedItem();
         assert currency != null;
-        isSuccess[2] = user.setCurrency(currency.toUpperCase(), selectUserBankAccount);
+        isSuccess[1] = user.setCurrency(currency.toUpperCase(), selectUserBankAccount);
 
         for (Boolean element : isSuccess) {
             if (!element) {
@@ -384,12 +363,10 @@ class Admin extends JFrame implements ActionListener {
         }
         String newCurrencyAccountID = createID(customerBankAccounts);
 
-        int balLeft;
-        int balRight;
+        BigDecimal balance;
 
         try {
-            balLeft = Integer.parseInt(balLeftTextField.getText());
-            balRight = Integer.parseInt(balRightTextField.getText());
+            balance = new BigDecimal(balanceTextField.getText());
         } catch (NumberFormatException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null,
@@ -400,7 +377,7 @@ class Admin extends JFrame implements ActionListener {
         String currency = (String) currencyCB.getSelectedItem();
         assert currency != null;
 
-        boolean result = user.createBankAccount(newCurrencyAccountID, balLeft, balRight, currency.toUpperCase());
+        boolean result = user.createBankAccount(newCurrencyAccountID, balance, currency.toUpperCase());
         if (result) {
             JOptionPane.showMessageDialog(null,
                     "New Bank Account --> " + newCurrencyAccountID + " Added!");
@@ -428,8 +405,7 @@ class Admin extends JFrame implements ActionListener {
     }
 
     private void clearAccountTextFields() {
-        balLeftTextField.setText("");
-        balRightTextField.setText("");
+        balanceTextField.setText("");
         currencyCB.setSelectedIndex(0);
     }
 

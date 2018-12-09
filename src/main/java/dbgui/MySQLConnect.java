@@ -1,4 +1,4 @@
-package account;
+package dbgui;
 
 import javax.swing.*;
 import java.sql.*;
@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 
 class MySQLConnect {
-    static boolean status;
+    public static boolean status;
     private static Connection con;
 
 
@@ -15,8 +15,6 @@ class MySQLConnect {
      */
     static Connection ConnectDB() {
         try {
-            // The newInstance() call is a work around for some
-            // broken Java implementations.
             Class.forName("com.mysql.cj.jdbc.Driver");
 
             String url = "jdbc:mysql://localhost/mydb" +

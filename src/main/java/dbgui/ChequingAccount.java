@@ -1,4 +1,4 @@
-package account;
+package dbgui;
 
 
 class ChequingAccount extends AccountImpl {

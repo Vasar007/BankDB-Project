@@ -1,4 +1,4 @@
-package account;
+package dbgui;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -220,8 +220,6 @@ class UserInterface extends JPanel implements ActionListener {
                      progressBar(true);
                      // If admin is logging in
                      if (select.equals("Admin Login") && username.getText().equals("admin")) {
-                         // JOptionPane.showMessageDialog(null, "Welcome Admin!");
-
                          // Close the current page and move to the Admin Panel
                          Admin admin = new Admin(frame);
                          admin.setVisible(true);
@@ -299,19 +297,22 @@ class UserInterface extends JPanel implements ActionListener {
      * @return isCorrect of type boolean
      */
     private boolean isLoginCorrect() {
+        String enteredPassword = String.valueOf(passwordField.getPassword());
+
         try {
-            String sql = "SELECT * FROM  account WHERE username=? AND password=?";
-            PreparedStatement pst = con.prepareStatement(sql);
-            pst.setString(1, username.getText());
-            pst.setString(2, String.valueOf(passwordField.getPassword()));
-            ResultSet rs = pst.executeQuery();
+            String sql = "SELECT password FROM  account WHERE username=?";
+            PreparedStatement statement = con.prepareStatement(sql);
+            statement.setString(1, username.getText());
 
-            if (rs.next())
-                return true;
-
-            } catch (Exception e) {
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    String rsPassword = rs.getString("password");
+                    return SafetyPassword.checkPass(enteredPassword, rsPassword);
+                }
+            }
+            } catch (SQLException e) {
                 e.printStackTrace();
-                JOptionPane.showMessageDialog(null, "Error --> System is Offline..");
+                JOptionPane.showMessageDialog(null, "Error --> System is Offline.");
             }
 
         return false;

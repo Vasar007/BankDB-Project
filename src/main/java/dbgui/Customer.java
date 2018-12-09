@@ -1,11 +1,13 @@
-package account;
+package dbgui;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Date;
 
 
@@ -31,29 +33,25 @@ class Customer extends JFrame implements ActionListener {
     private JButton updateLastNameButton;
     private JButton updateSINButton;
     private JButton updateBirthDateButton;
+    private JButton depositButton;
+    private JButton withdrawButton;
     private JLabel IDLabel;
     private JLabel lastActivityLabel;
-    private JLabel balLeftLabel;
-    private JLabel balRightLabel;
+    private JLabel balanceLabel;
     private JLabel currencyLabel;
     private JFrame parent;
 
     private String selectUserBankAccount = null;
 
     private ChequingAccount user;
-    private IdleListener timer;
 
 
     Customer(String username, JFrame parent) {
         super("**** Customer Console : " + username + " ****");
         this.parent = parent;
-        timer = new IdleListener(180);
 
         user = new ChequingAccount(username);
         initialize();
-
-        timer.startTimer();
-
         getUserData();
     }
 
@@ -65,19 +63,17 @@ class Customer extends JFrame implements ActionListener {
         lastNameTextField.setText(user.getLastName());
         SINTextField.setText(user.getSIN());
         birthDateTextField.setText(user.getBirthDate().toString());
-        balLeftLabel.setText("");
-        balRightLabel.setText("");
+        balanceLabel.setText("");
         currencyLabel.setText("");
         lastActivityLabel.setText(user.getLastActivity());
         IDLabel.setText(user.getID());
     }
 
     /**
-     * Retrieves the account information
+     * Retrieves the action information
      */
     private void getAccountData(String bankAccount){
-        balLeftLabel.setText(Integer.toString(user.getBalLeft(bankAccount)));
-        balRightLabel.setText(Integer.toString(user.getBalRight(bankAccount)));
+        balanceLabel.setText(user.getBalance(bankAccount).toString());
         currencyLabel.setText(user.getCurrency(bankAccount));
     }
 
@@ -85,7 +81,7 @@ class Customer extends JFrame implements ActionListener {
      * Initializes and creates all the visual elements required for this Frame
      */
     private void initialize() {
-        setSize(500, 700);
+        setSize(500, 850);
         setResizable(false);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
@@ -135,8 +131,18 @@ class Customer extends JFrame implements ActionListener {
         jsonButton.setActionCommand("OUTJSON");
         jsonButton.addActionListener(this);
 
+        JButton historyButton = new JButton("Show History");
+        historyButton.setFont(sansSerifBold);
+        historyButton.setBackground(foregroundColor);
+        historyButton.setForeground(backgroundColor);
+        historyButton.setPreferredSize(new Dimension(140,40));
+        historyButton.setSize(new Dimension(10, 10));
+        historyButton.setActionCommand("HISTORY");
+        historyButton.addActionListener(this);
+
         // Line1 (AccountID)
-        JPanel p = new JPanel();
+        JPanel accountPanel = new JPanel();
+        accountPanel.setLayout(new GridLayout(2, 2,1,1));
 
         ArrayList<String> customerBankAccounts = MySQLConnect.getCustomersBankAccounts(user.getID());
 
@@ -154,12 +160,13 @@ class Customer extends JFrame implements ActionListener {
         IDLabel = new JLabel("N/A");
         accID.setFont(sansSerifBoldBig);
         IDLabel.setFont(sansSerifBoldBig);
-        p.add(jsonButton);
-        p.add(accID);
-        p.add(IDLabel);
+        accountPanel.add(jsonButton);
+        accountPanel.add(historyButton);
+        accountPanel.add(accID);
+        accountPanel.add(IDLabel);
 
         // Line2 ( name )
-        JPanel panel1 = new JPanel();
+        JPanel namePanel = new JPanel();
         nameTextField = new JTextField("N/A");
         nameTextField.setPreferredSize(new Dimension(200,40));
         nameTextField.setFont(sansSerifBoldBig);
@@ -172,16 +179,17 @@ class Customer extends JFrame implements ActionListener {
         updateNameButton.setForeground(backgroundColor);
         updateNameButton.setActionCommand("NAME");
         updateNameButton.addActionListener(this);
-        panel1.add(nameTextField);
-        panel1.add(updateNameButton);
+        namePanel.add(nameTextField);
+        namePanel.add(updateNameButton);
 
         // Line3 ( lastActivityLabel name )
-        JPanel panel2 = new JPanel();
+        JPanel lastActivityPanel = new JPanel();
         lastNameTextField = new JTextField("N/A");
         lastNameTextField.setPreferredSize(new Dimension(200,40));
         lastNameTextField.setFont(sansSerifBoldBig);
         lastNameTextField.setBorder(BorderFactory.createTitledBorder(new TitledBorder("Last Name:")));
         lastNameTextField.setForeground(foregroundColor);
+
         updateLastNameButton = new JButton("Update");
         updateLastNameButton.setPreferredSize(new Dimension(140,40));
         updateLastNameButton.setFont(sansSerifBold);
@@ -189,11 +197,12 @@ class Customer extends JFrame implements ActionListener {
         updateLastNameButton.setForeground(backgroundColor);
         updateLastNameButton.setActionCommand("LASTNAME");
         updateLastNameButton.addActionListener(this);
-        panel2.add(lastNameTextField);
-        panel2.add(updateLastNameButton);
+
+        lastActivityPanel.add(lastNameTextField);
+        lastActivityPanel.add(updateLastNameButton);
 
         // Line4 ( Social Insurance Number )
-        JPanel panel3 = new JPanel();
+        JPanel SINPanel = new JPanel();
         SINTextField = new JTextField("N/A");
         SINTextField.setPreferredSize(new Dimension(200,40));
         SINTextField.setFont(sansSerifBoldBig);
@@ -206,16 +215,17 @@ class Customer extends JFrame implements ActionListener {
         updateSINButton.setForeground(backgroundColor);
         updateSINButton.setActionCommand("SIN");
         updateSINButton.addActionListener(this);
-        panel3.add(SINTextField);
-        panel3.add(updateSINButton);
+        SINPanel.add(SINTextField);
+        SINPanel.add(updateSINButton);
 
         // Line5 ( BirthDate )
-        JPanel panel4 = new JPanel();
+        JPanel birthDatePanel = new JPanel();
         birthDateTextField = new JTextField("N/A");
         birthDateTextField.setPreferredSize(new Dimension(200,40));
         birthDateTextField.setFont(sansSerifBoldBig);
         birthDateTextField.setBorder(BorderFactory.createTitledBorder(new TitledBorder("Birth Date:")));
         birthDateTextField.setForeground(foregroundColor);
+
         updateBirthDateButton = new JButton("Update");
         updateBirthDateButton.setPreferredSize(new Dimension(140,40));
         updateBirthDateButton.setFont(sansSerifBold);
@@ -223,82 +233,85 @@ class Customer extends JFrame implements ActionListener {
         updateBirthDateButton.setForeground(backgroundColor);
         updateBirthDateButton.setActionCommand("DATE");
         updateBirthDateButton.addActionListener(this);
-        panel4.add(birthDateTextField);
-        panel4.add(updateBirthDateButton);
+
+        birthDatePanel.add(birthDateTextField);
+        birthDatePanel.add(updateBirthDateButton);
 
         // Balance Field
-        JPanel panel5 = new JPanel();
-        JLabel label5 = new JLabel("Balance: ");
-        balLeftLabel = new JLabel("N/A");//balLeft
-        JLabel label7 = new JLabel(".");
-        balRightLabel = new JLabel("N/A"); // balRight
-        currencyLabel = new JLabel("N/A");//currency
+        JPanel balanceFieldPanel = new JPanel();
+        JLabel balanceTitleLabel = new JLabel("Balance: ");
+        balanceLabel = new JLabel("N/A");
+        currencyLabel = new JLabel("N/A");
 
-        label5.setFont(sansSerifBoldLarge);
-        balLeftLabel.setFont(sansSerifBoldLarge);
-        label7.setFont(sansSerifBoldLarge);
-        balRightLabel.setFont(sansSerifBoldLarge);
+        balanceTitleLabel.setFont(sansSerifBoldLarge);
+        balanceLabel.setFont(sansSerifBoldLarge);
         currencyLabel.setFont(sansSerifBoldLarge);
-        panel5.setForeground(foregroundColor);
-        panel5.add(label5);
-        panel5.add(balLeftLabel);
-        panel5.add(label7);
-        panel5.add(balRightLabel);
-        panel5.add(currencyLabel);
+        balanceFieldPanel.setForeground(foregroundColor);
+        balanceFieldPanel.add(balanceTitleLabel);
+        balanceFieldPanel.add(balanceLabel);
+        balanceFieldPanel.add(currencyLabel);
 
         // Deposit Field
-        JPanel panel6 = new JPanel();
+        JPanel depositPanel = new JPanel();
         depositTextField = new JTextField();
         depositTextField.setPreferredSize(new Dimension(200,40));
         depositTextField.setFont(sansSerifBoldBig);
         depositTextField.setBorder(BorderFactory.createTitledBorder(new TitledBorder("Enter Amount:")));
         depositTextField.setForeground(foregroundColor);
-        JButton button6 = new JButton("Deposit");
-        button6.setPreferredSize(new Dimension(140,40));
-        button6.setFont(sansSerifBold);
-        button6.setBackground(Color.RED);
-        button6.setForeground(backgroundColor);
-        button6.setActionCommand("DEPOSIT");
-        button6.addActionListener(this);
-        panel6.add(button6);
-        panel6.add(depositTextField);
+        depositTextField.setEnabled(false);
+
+        depositButton = new JButton("Deposit");
+        depositButton.setPreferredSize(new Dimension(140,40));
+        depositButton.setFont(sansSerifBold);
+        depositButton.setBackground(Color.RED);
+        depositButton.setForeground(backgroundColor);
+        depositButton.setActionCommand("DEPOSIT");
+        depositButton.addActionListener(this);
+        depositButton.setEnabled(false);
+
+        depositPanel.add(depositButton);
+        depositPanel.add(depositTextField);
 
         // Withdraw Field
-        JPanel panel7 = new JPanel();
+        JPanel withdrawPanel = new JPanel();
         withdrawTextField = new JTextField();
         withdrawTextField.setPreferredSize(new Dimension(200,40));
         withdrawTextField.setFont(sansSerifBoldBig);
         withdrawTextField.setBorder(BorderFactory.createTitledBorder(new TitledBorder("Enter Amount:")));
         withdrawTextField.setForeground(foregroundColor);
-        JButton button7 = new JButton("Withdraw");
-        button7.setPreferredSize(new Dimension(140,40));
-        button7.setFont(sansSerifBold);
-        button7.setBackground(Color.BLUE);
-        button7.setForeground(backgroundColor);
-        button7.setActionCommand("WITHDRAW");
-        button7.addActionListener(this);
-        panel7.add(button7);
-        panel7.add(withdrawTextField);
+        withdrawTextField.setEnabled(false);
+
+        withdrawButton = new JButton("Withdraw");
+        withdrawButton.setPreferredSize(new Dimension(140,40));
+        withdrawButton.setFont(sansSerifBold);
+        withdrawButton.setBackground(Color.BLUE);
+        withdrawButton.setForeground(backgroundColor);
+        withdrawButton.setActionCommand("WITHDRAW");
+        withdrawButton.addActionListener(this);
+        withdrawButton.setEnabled(false);
+
+        withdrawPanel.add(withdrawButton);
+        withdrawPanel.add(withdrawTextField);
 
         // Last Activity Line
-        JPanel lastActivity = new JPanel();
-        JLabel la = new JLabel("Last Activity: ");
-        la.setFont(sansSerifItalic);
+        JPanel lastActivityFiledPanel = new JPanel();
+        JLabel lastActivityTitleLabel = new JLabel("Last Activity: ");
+        lastActivityTitleLabel.setFont(sansSerifItalic);
         lastActivityLabel = new JLabel("N/A");
         lastActivityLabel.setFont(sansSerifItalic);
-        lastActivity.add(la);
-        lastActivity.add(lastActivityLabel);
+        lastActivityFiledPanel.add(lastActivityTitleLabel);
+        lastActivityFiledPanel.add(lastActivityLabel);
 
         JPanel midPanel = new JPanel();
-        infoPanel.add(p);
-        infoPanel.add(panel1);
-        infoPanel.add(panel2);
-        infoPanel.add(panel3);
-        infoPanel.add(panel4);
-        balancePanel.add(panel5);
-        balancePanel.add(panel6);
-        balancePanel.add(panel7);
-        balancePanel.add(lastActivity);
+        infoPanel.add(accountPanel);
+        infoPanel.add(namePanel);
+        infoPanel.add(lastActivityPanel);
+        infoPanel.add(SINPanel);
+        infoPanel.add(birthDatePanel);
+        balancePanel.add(balanceFieldPanel);
+        balancePanel.add(depositPanel);
+        balancePanel.add(withdrawPanel);
+        balancePanel.add(lastActivityFiledPanel);
 
         midPanel.add(selectPanel);
         midPanel.add(infoPanel);
@@ -308,9 +321,15 @@ class Customer extends JFrame implements ActionListener {
         this.add(midPanel,BorderLayout.CENTER);
     }
 
+    private void toggleBankAccountButtons(boolean flag) {
+        depositTextField.setEnabled(flag);
+        withdrawTextField.setEnabled(flag);
+        depositButton.setEnabled(flag);
+        withdrawButton.setEnabled(flag);
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
-        timer.eventDispatched(e);
         eventHandler(e);
     }
 
@@ -332,6 +351,7 @@ class Customer extends JFrame implements ActionListener {
                 try {
                     if (selectUserBankAccount != null) {
                         getAccountData(selectUserBankAccount);
+                        toggleBankAccountButtons(true);
                     }
                 } catch (Exception e){
                     e.printStackTrace();
@@ -342,6 +362,8 @@ class Customer extends JFrame implements ActionListener {
                     depositTextField.setText("");
                     withdrawTextField.setText("");
                     lastActivityLabel.setText("N/A");
+
+                    toggleBankAccountButtons(false);
                 }
             }
         } else if ("LOGOUT".equals(event.getActionCommand())) {
@@ -364,15 +386,9 @@ class Customer extends JFrame implements ActionListener {
         }
 
         else if ("SIN".equals(event.getActionCommand())) {
-            try{
-                boolean isSuccess = user.setSIN(SINTextField.getText());
-                if (isSuccess) updateSINButton.setBackground(successColor);
-                else updateSINButton.setBackground(failureColor);
-            } catch (NumberFormatException e){
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(null,"Error --> Please Enter an Integer");
-                updateSINButton.setBackground(failureColor);
-            }
+            boolean isSuccess = user.setSIN(SINTextField.getText());
+            if (isSuccess) updateSINButton.setBackground(successColor);
+            else updateSINButton.setBackground(failureColor);
         }
 
         else if ("DATE".equals(event.getActionCommand())) {
@@ -383,40 +399,49 @@ class Customer extends JFrame implements ActionListener {
 
         else if ("DEPOSIT".equals(event.getActionCommand())) {
             try {
-                user.deposit(Integer.parseInt(depositTextField.getText()), selectUserBankAccount);
+                user.deposit(new BigDecimal(depositTextField.getText()), selectUserBankAccount);
             } catch (NumberFormatException e) {
                 e.printStackTrace();
-                JOptionPane.showMessageDialog(null,"Error --> Please Enter an Integer");
+                JOptionPane.showMessageDialog(null,"Error --> Please Enter a Valid Number!");
             }
-            balLeftLabel.setText(Integer.toString(user.getBalLeft(selectUserBankAccount)));
+            balanceLabel.setText(user.getBalance(selectUserBankAccount).toString());
+            depositTextField.setText("");
         }
 
         else if ("WITHDRAW".equals(event.getActionCommand())) {
             try {
-                user.withdraw(Integer.parseInt(withdrawTextField.getText()), selectUserBankAccount);
+                user.withdraw(new BigDecimal(withdrawTextField.getText()), selectUserBankAccount);
             } catch (NumberFormatException e) {
                 e.printStackTrace();
-                JOptionPane.showMessageDialog(null,"Error --> Please Enter an Integer( Multiples of 20 )");
+                JOptionPane.showMessageDialog(null,"Error --> Please Enter a Valid Number!");
             }
-            balLeftLabel.setText(Integer.toString(user.getBalLeft(selectUserBankAccount)));
+            balanceLabel.setText(user.getBalance(selectUserBankAccount).toString());
+            withdrawTextField.setText("");
         }
 
         else if ("OUTJSON".equals(event.getActionCommand())) {
             // create a JTextArea
-            JTextArea textArea = new JTextArea(25, 75);
+            JTextArea textArea = new JTextArea(25, 100);
             textArea.setLineWrap(true);
             textArea.setText(user.getJSON()
                     .replace("},", "},\n\t")
                     .replace("],", "\n],\n\n")
                     .replace("[{", "[\n\t{"));
             textArea.setEditable(false);
-            textArea.setFont(sansSerifBoldLarge);
+            textArea.setFont(sansSerifBold);
 
             // wrap a scrollpane around it
             JScrollPane scrollPane = new JScrollPane(textArea);
 
             // display them in a message dialog
             JOptionPane.showMessageDialog(null, scrollPane);
+        }
+
+        else if ("HISTORY".equals(event.getActionCommand())) {
+            List<String> result = user.getActions();
+            String output = String.join("\n", result);
+            if (output.isEmpty()) output = "No Activity Found.";
+            JOptionPane.showMessageDialog(null, output);
         }
     }
 }

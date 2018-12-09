@@ -1,6 +1,7 @@
-package account;
+package dbgui;
 
 import javax.swing.*;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -9,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.json.simple.JSONValue;
+import org.mindrot.jbcrypt.BCrypt;
 
 
 /**
@@ -108,7 +110,6 @@ class AccountImpl implements Account{
 						birthDate = rs.getDate("birthdate");
 					}
 				}
-
 				bankAccount.loadData(ID);
 			}
 
@@ -216,6 +217,7 @@ class AccountImpl implements Account{
 	 	String sql2 = "SELECT * FROM bankaccount WHERE accountID=?";
 	 	String sql3 = "SELECT * FROM bankdb WHERE accountID=?";
 	 	String sql4 = "SELECT * FROM clientinfo WHERE SIN=?";
+	 	String sql5 = "SELECT * FROM activity WHERE accountID=?";
 
 		try (PreparedStatement statement1 = con.prepareStatement(sql1)) {
 			statement1.setString(1, ID);
@@ -247,11 +249,18 @@ class AccountImpl implements Account{
 					resultJson.putAll(getJSONMapFromResultSet(rs, "clientinfo"));
 				}
 			}
+
+			try (PreparedStatement statement5 = con.prepareStatement(sql5)) {
+				statement5.setString(1, ID);
+
+				try (ResultSet rs = statement5.executeQuery()) {
+					resultJson.putAll(getJSONMapFromResultSet(rs, "activity"));
+				}
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null,"Error --> Cannot Get Data from DB!");
 		}
-
 		return JSONValue.toJSONString(resultJson);
 	}
 
@@ -278,7 +287,6 @@ class AccountImpl implements Account{
 			 JOptionPane.showMessageDialog(null,"Error --> Cannot Update Name!");
 			 isSuccess = false;
 		 }
-
 		return isSuccess;
 	 }
 
@@ -304,7 +312,6 @@ class AccountImpl implements Account{
 			 JOptionPane.showMessageDialog(null,"Error --> Cannot Update Last Name!");
 			 isSuccess = false;
 		 }
-
 		 return isSuccess;
 	 }
 
@@ -326,7 +333,6 @@ class AccountImpl implements Account{
 			JOptionPane.showMessageDialog(null,"Error --> Cannot Update Birth Date!");
 			isSuccess = false;
 		}
-
 		return isSuccess;
 	 }
 
@@ -351,7 +357,6 @@ class AccountImpl implements Account{
 			 JOptionPane.showMessageDialog(null,"Error --> Cannot Update SIN!");
 			 isSuccess = false;
 		 }
-
 		 return isSuccess;
 	 }
 
@@ -363,13 +368,8 @@ class AccountImpl implements Account{
 	 }
 
 	@Override
-	public boolean setBalLeft(int balLeft, String currencyAccountID) {
-	 	return bankAccount.setBalLeft(balLeft, currencyAccountID);
-	 }
-
-	@Override
-	public boolean setBalRight(int balRight, String currencyAccountID) {
-		return bankAccount.setBalRight(balRight, currencyAccountID);
+	public boolean setBalance(BigDecimal balance, String currencyAccountID) {
+	 	return bankAccount.setBalance(balance, currencyAccountID);
 	 }
 
 	@Override
@@ -388,13 +388,11 @@ class AccountImpl implements Account{
 			 statement.setString(2, ID);
 			 statement.executeUpdate();
 			 isSuccess = true;
-
 		 } catch (SQLException e) {
              e.printStackTrace();
 			 JOptionPane.showMessageDialog(null,"Error --> Cannot Update Last Activity!");
 			 isSuccess = false;
 		 }
-
 		 return isSuccess;
 	 }
 
@@ -429,13 +427,8 @@ class AccountImpl implements Account{
 	}
 
 	@Override
-	public List<Integer> getAllBalLeft() {
-		return bankAccount.getAllBalLeft();
-	}
-
-	@Override
-	public List<Integer> getAllBalRight() {
-		return bankAccount.getAllBalRight();
+	public List<BigDecimal> getAllBalances() {
+		return bankAccount.getAllBalances();
 	}
 
 	@Override
@@ -444,13 +437,8 @@ class AccountImpl implements Account{
 	}
 
 	@Override
-	public int getBalLeft(String currencyAccountID) {
-		 return bankAccount.getBalLeft(currencyAccountID);
-	 }
-
-	@Override
-	public int getBalRight(String currencyAccountID) {
-		return bankAccount.getBalRight(currencyAccountID);
+	public BigDecimal getBalance(String currencyAccountID) {
+		 return bankAccount.getBalance(currencyAccountID);
 	 }
 
 	@Override
@@ -467,16 +455,16 @@ class AccountImpl implements Account{
 	 * Withdraw method is used to withdraw value from the balance
 	 */
 	@Override
-	public boolean withdraw(int amount, String currencyAccountID) {
-		return bankAccount.withdraw(amount, currencyAccountID);
+	public boolean withdraw(BigDecimal amount, String currencyAccountID) {
+		return bankAccount.withdraw(amount, ID, currencyAccountID);
 	}
 
 	/**
 	 * Deposit method used to deposit some amount to the account
 	 */
 	@Override
-	public boolean deposit(int amount, String currencyAccountID) {
-		return bankAccount.deposit(amount, currencyAccountID);
+	public boolean deposit(BigDecimal amount, String currencyAccountID) {
+		return bankAccount.deposit(amount, ID, currencyAccountID);
 	}
 
 	/**
@@ -485,9 +473,9 @@ class AccountImpl implements Account{
 	@Override
 	public boolean createAccount() {
 		boolean isSuccess;
-		String sql1 = "INSERT INTO bankdb(accountID, SIN, lastactivity) VALUES(?, ?, ?);";
-		String sql2 = "INSERT INTO account(accountID, username, password) VALUES(?, ?, ?); ";
-		String sql3 = "INSERT INTO clientinfo(name, lastname, birthdate, SIN) VALUES(?, ?, ?, ?); ";
+		String sql1 = "INSERT INTO bankdb(accountID, SIN, lastactivity) VALUES(?, ?, ?)";
+		String sql2 = "INSERT INTO account(accountID, username, password) VALUES(?, ?, ?)";
+		String sql3 = "INSERT INTO clientinfo(name, lastname, birthdate, SIN) VALUES(?, ?, ?, ?)";
 
 		try (PreparedStatement statement1 = con.prepareStatement(sql1)) {
 			con.setAutoCommit(false);
@@ -498,8 +486,8 @@ class AccountImpl implements Account{
 
 			try (PreparedStatement statement2 = con.prepareStatement(sql2)) {
 				statement2.setString(1, ID);
-				statement2.setString(2, name);
-				statement2.setString(3, SIN);
+				statement2.setString(2, name.replace(" ", ""));
+				statement2.setString(3, SafetyPassword.hashPassword(SIN));
 				statement2.executeUpdate();
 			}
 
@@ -529,9 +517,9 @@ class AccountImpl implements Account{
 				con.setAutoCommit(true);
 			} catch (SQLException e) {
 				e.printStackTrace();
+				isSuccess = false;
 			}
 		}
-
 		return isSuccess;
 	}
 
@@ -584,16 +572,16 @@ class AccountImpl implements Account{
 				con.setAutoCommit(true);
 			} catch (SQLException e) {
 				e.printStackTrace();
+				isSuccess = false;
 			}
 		}
-
 		return isSuccess;
 	}
 
 	@Override
-	public boolean createBankAccount(String newCurrencyAccountID, int balleft, int balright,
+	public boolean createBankAccount(String newCurrencyAccountID, BigDecimal balance,
 							         String currency) {
-		return bankAccount.createAccount(ID, newCurrencyAccountID, balleft, balright, currency);
+		return bankAccount.createAccount(ID, newCurrencyAccountID, balance, currency);
 	}
 
 	@Override
@@ -604,5 +592,10 @@ class AccountImpl implements Account{
 	@Override
 	public boolean deleteBankAccount(String currencyAccountID) {
 		return bankAccount.deleteAccount(currencyAccountID);
+	}
+
+	@Override
+	public List<String> getActions() {
+		return bankAccount.getActions(ID);
 	}
 }

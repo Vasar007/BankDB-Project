@@ -1,5 +1,6 @@
-package account;
+package dbgui;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
 
@@ -11,9 +12,8 @@ public interface Account {
     boolean setBirthDate(String birthDate);
     boolean setSIN(String SIN);
     boolean setID(String ID); //admin
-    boolean setBalLeft(int balLeft, String currencyAccountID);
-    boolean setBalRight(int balRight, String currencyAccountID); //admin
-    boolean setCurrency(String currency, String currencyAccountID); //admin
+    boolean setBalance(BigDecimal balance, String currencyAccountID);
+    boolean setCurrency(String currency, String currencyAccountID);
     boolean setLastActivity(String lastActivity);//auto
 
 	// Getters
@@ -23,22 +23,21 @@ public interface Account {
 	String getSIN();
 	String getID();
 	List<String> getCurrencyAccountIDs();
-	List<Integer> getAllBalLeft();
-	List<Integer> getAllBalRight();
+	List<BigDecimal> getAllBalances();
 	List<String> getAllCurrencies();
-	int getBalLeft(String currencyAccountID);
-	int getBalRight(String currencyAccountID);
+	BigDecimal getBalance(String currencyAccountID);
 	String getCurrency(String currencyAccountID);
     String getLastActivity();
 
-	boolean withdraw(int amount, String currencyAccountID);
-	boolean deposit(int amount, String currencyAccountID);
+	boolean withdraw(BigDecimal amount, String currencyAccountID);
+	boolean deposit(BigDecimal amount, String currencyAccountID);
 	
 	boolean createAccount();
 	boolean deleteAccount(String accountID);
 
-	boolean createBankAccount(String newCurrencyAccountID, int balleft, int balright,
-						      String currency);
+	boolean createBankAccount(String newCurrencyAccountID, BigDecimal balance, String currency);
 	void updateBankAccount();
 	boolean deleteBankAccount(String currencyAccountID);
+
+	List<String> getActions();
 }
