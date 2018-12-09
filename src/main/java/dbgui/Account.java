@@ -33,7 +33,7 @@ public interface Account {
 	boolean deposit(BigDecimal amount, String currencyAccountID);
 	
 	boolean createAccount();
-	boolean deleteAccount(String accountID);
+	boolean deleteAccount();
 
 	boolean createBankAccount(String newCurrencyAccountID, BigDecimal balance, String currency);
 	void updateBankAccount();

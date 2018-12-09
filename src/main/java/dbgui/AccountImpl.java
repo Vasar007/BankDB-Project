@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.json.simple.JSONValue;
-import org.mindrot.jbcrypt.BCrypt;
 
 
 /**
@@ -63,7 +62,7 @@ class AccountImpl implements Account{
 	 * @param username of type String
      */
 	private void findAccountID(String username) {
-		String sql = "SELECT accountID FROM account WHERE username=?";
+		String sql = "SELECT accountID FROM account WHERE username=? ORDER BY accountID";
 
 		try (PreparedStatement statement = con.prepareStatement(sql)) {
 			statement.setString(1, username);
@@ -527,25 +526,26 @@ class AccountImpl implements Account{
 	 * Deletes an account
 	 */
 	@Override
-	public boolean deleteAccount(String accountID) {
+	public boolean deleteAccount() {
 		boolean isSuccess;
 		String sql1 = "DELETE FROM bankdb WHERE accountID=?";
 		String sql2 = "DELETE FROM account WHERE accountID=?";
 		String sql3 = "DELETE FROM bankaccount WHERE accountID=?";
 		String sql4 = "DELETE FROM clientinfo WHERE SIN=?";
+		String sql5 = "DELETE FROM activity WHERE accountID=?";
 
 		try (PreparedStatement statement1 = con.prepareStatement(sql1)) {
 			con.setAutoCommit(false);
-			statement1.setString(1, accountID);
+			statement1.setString(1, ID);
 			statement1.executeUpdate();
 
 			try (PreparedStatement statement2 = con.prepareStatement(sql2)) {
-				statement2.setString(1, accountID);
+				statement2.setString(1, ID);
 				statement2.executeUpdate();
 			}
 
 			try (PreparedStatement statement3 = con.prepareStatement(sql3)) {
-				statement3.setString(1, accountID);
+				statement3.setString(1, ID);
 				statement3.executeUpdate();
 			}
 
@@ -553,6 +553,11 @@ class AccountImpl implements Account{
 				statement4.setString(1, SIN);
 				statement4.executeUpdate();
 			}
+
+            try (PreparedStatement statement5 = con.prepareStatement(sql5)) {
+                statement5.setString(1, ID);
+                statement5.executeUpdate();
+            }
 
 			con.commit();
 			isSuccess = true;

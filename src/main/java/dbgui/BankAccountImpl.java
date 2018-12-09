@@ -127,7 +127,7 @@ public class BankAccountImpl implements BankAccount {
     public boolean loadData(String accountID) {
         boolean isSuccess;
         clearData();
-        String sql = "SELECT currencyaccountID, balance, currency FROM bankaccount WHERE accountID=?";
+        String sql = "SELECT currencyaccountID, balance, currency FROM bankaccount WHERE accountID=? ORDER BY currencyaccountID";
 
         try (PreparedStatement statement = con.prepareStatement(sql)) {
             statement.setString(1, accountID);
@@ -182,7 +182,7 @@ public class BankAccountImpl implements BankAccount {
     @Override
     public List<String> getActions(String accountID) {
         List<String> result = new ArrayList<>();
-        String sql = "SELECT actionID, action, actiondatetime FROM activity WHERE accountID=?";
+        String sql = "SELECT actionID, action, actiondatetime FROM activity WHERE accountID=? ORDER BY actiondatetime";
 
         try (PreparedStatement statement = con.prepareStatement(sql)) {
             statement.setString(1, accountID);

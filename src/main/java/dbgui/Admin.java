@@ -488,7 +488,7 @@ class Admin extends JFrame implements ActionListener {
                                     "New Customer Account Info --> "+ user.getID() + " Added  (username: " +
                                             user.getName() + ", password: " + user.getSIN() + ")!");
                         } else {
-                            user.deleteAccount(newID);
+                            user.deleteAccount();
                         }
                     }
                 } else if (selectUserBankAccount.equals("-- Create New --")) {
@@ -525,14 +525,13 @@ class Admin extends JFrame implements ActionListener {
                     JOptionPane.showMessageDialog(null, "Cannot Delete Admin!");
                     break;
                 default:
-                    String userID = user.getID();
                     int response = JOptionPane.showConfirmDialog(null,
-                            "Delete " + user.findUserName(userID) + " ?");
+                            "Delete " + user.findUserName(user.getID()) + " ?");
 
                     if (response == JOptionPane.OK_OPTION) {
                         JOptionPane.showMessageDialog(null,
-                                "ID "+ userID + " Has Been Successfully Deleted!");
-                        user.deleteAccount(user.getID());
+                                "ID "+ user.getID() + " Has Been Successfully Deleted!");
+                        user.deleteAccount();
 
                         customersList = MySQLConnect.getCustomers();
                         updateList(customersListCB, customersList);
