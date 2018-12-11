@@ -64,7 +64,6 @@ class UserInterface extends JPanel implements ActionListener {
         JPanel rightPanel = new JPanel();
         JPanel bottomPanel = new JPanel();
 
-
         // Change their layouts and background color
         leftPanel.setBackground(backgroundColor);
         authPanel.setBackground(backgroundColor);
@@ -97,7 +96,6 @@ class UserInterface extends JPanel implements ActionListener {
         ImageIcon icon = createImageIcon("images/logo.png");
         logo.setIcon(icon);
         logo.setBorder(BorderFactory.createEmptyBorder(10,20,0,20));
-
 
         // Set up the password field
         passwordField = new JPasswordField(10);
@@ -143,7 +141,6 @@ class UserInterface extends JPanel implements ActionListener {
         progress.setMaximum(100);
         progress.setPreferredSize(new Dimension(600,20));
         progress.setBorderPainted(false);
-
 
         // Add Elements to the page
         JLabel pad1 = new JLabel("-----------------------------------------------------");
@@ -224,8 +221,7 @@ class UserInterface extends JPanel implements ActionListener {
                          frame.setVisible(false);
                          con.close();  // close the connection
                          con = null;
-                     }
-                     else if (select.equals("Admin Login") && !username.getText().equals("admin")) {
+                     } else if (select.equals("Admin Login") && !username.getText().equals("admin")) {
                          cannotLogin();
                      }
                      // If admin or customers are logging in
@@ -238,8 +234,7 @@ class UserInterface extends JPanel implements ActionListener {
                          con.close(); // close the connection
                          con = null;
                     }
-                 }
-                 else {
+                 } else {
                      cannotLogin();
                  }
             } catch (Exception e) {
@@ -269,8 +264,7 @@ class UserInterface extends JPanel implements ActionListener {
                 i++;
                 progress.setValue(i);
             }
-        }
-        else {
+        } else {
             progress.setForeground(Color.RED);
             while (i < 100) {
                 i++;
@@ -297,11 +291,10 @@ class UserInterface extends JPanel implements ActionListener {
                     return SafetyPassword.checkPass(enteredPassword, rsPassword);
                 }
             }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(null, "Error --> System is Offline.");
-            }
-
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error --> System is Offline.");
+        }
         return false;
    }
 

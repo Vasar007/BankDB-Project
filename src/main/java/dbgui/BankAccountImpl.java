@@ -32,8 +32,22 @@ public class BankAccountImpl implements BankAccount {
         currencies.clear();
     }
 
+    private BigDecimal checkSmallSize(BigDecimal bigDecimal) {
+        if (bigDecimal.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
+        return bigDecimal;
+    }
+
     @Override
     public boolean setBalance(BigDecimal balance, String currencyAccountID) {
+        balance = checkSmallSize(balance);
+
+        if (balance.signum() < 0) {
+            JOptionPane.showMessageDialog(null,"Error --> Negative amount!");
+            return false;
+        }
+
         this.balances.set(getIndex(currencyAccountID), balance);
         boolean isSuccess;
         String sql = "UPDATE bankaccount SET balance=? WHERE currencyaccountID=?";
@@ -87,7 +101,9 @@ public class BankAccountImpl implements BankAccount {
 
     @Override
     public BigDecimal getBalance(String currencyAccountID) {
-        return balances.get(getIndex(currencyAccountID));
+        BigDecimal balance = balances.get(getIndex(currencyAccountID));
+        balance = checkSmallSize(balance);
+        return balance;
     }
 
     @Override
@@ -98,6 +114,12 @@ public class BankAccountImpl implements BankAccount {
     @Override
     public boolean withdraw(BigDecimal amount, String accountID, String currencyAccountID) {
         BigDecimal balance = getBalance(currencyAccountID);
+
+        if (amount.signum() <= 0) {
+            JOptionPane.showMessageDialog(null,"Error --> Non-positive amount!");
+            return false;
+        }
+
         if (balance.compareTo(amount) < 0) {
             JOptionPane.showMessageDialog(null,"Error --> Amount exceeds the balance!");
             return false;
@@ -145,7 +167,6 @@ public class BankAccountImpl implements BankAccount {
             JOptionPane.showMessageDialog(null,"Load Bank Account Unsuccessful!");
             isSuccess = false;
         }
-
         return isSuccess;
     }
 
@@ -223,6 +244,13 @@ public class BankAccountImpl implements BankAccount {
      */
     @Override
     public boolean createAccount(String accountID, String newCurrencyAccountID, BigDecimal balance, String currency) {
+        balance = checkSmallSize(balance);
+
+        if (balance.signum() < 0) {
+            JOptionPane.showMessageDialog(null,"Error --> Negative amount!");
+            return false;
+        }
+
         boolean isSuccess;
         String sql = "INSERT INTO bankaccount(accountID, currencyaccountID, balance, currency) " +
                 "VALUES(?, ?, ?, ?)";

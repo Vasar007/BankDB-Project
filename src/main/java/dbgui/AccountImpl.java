@@ -192,10 +192,10 @@ class AccountImpl implements Account{
 				while (rs.next()) {
 					Map<String,Object> columnMap = new HashMap<>();
 					for (int columnIndex = 1; columnIndex <= metaData.getColumnCount(); columnIndex++) {
-						if (rs.getString(metaData.getColumnName(columnIndex)) != null)
-							columnMap.put(metaData.getColumnLabel(columnIndex),
-										  rs.getString(metaData.getColumnName(columnIndex)));
-						else {
+						if (rs.getString(metaData.getColumnName(columnIndex)) != null) {
+                            columnMap.put(metaData.getColumnLabel(columnIndex),
+                                    rs.getString(metaData.getColumnName(columnIndex)));
+                        } else {
 							columnMap.put(metaData.getColumnLabel(columnIndex), "null");
 						}
 					}
