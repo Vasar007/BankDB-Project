@@ -7,10 +7,13 @@ import java.sql.ResultSet;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
 public class BankAccountImpl implements BankAccount {
+    private static final List<String> availableActions = Arrays.asList("deposit", "withdraw", "update", "NA");
+
     private List<String> currencyAccountIDs = new ArrayList<>();
     private List<BigDecimal> balances = new ArrayList<>();
     private List<String> currencies = new ArrayList<>();
@@ -48,7 +51,6 @@ public class BankAccountImpl implements BankAccount {
             return false;
         }
 
-        this.balances.set(getIndex(currencyAccountID), balance);
         boolean isSuccess;
         String sql = "UPDATE bankaccount SET balance=? WHERE currencyaccountID=?";
 
@@ -56,6 +58,8 @@ public class BankAccountImpl implements BankAccount {
             statement.setBigDecimal(1, balance);
             statement.setString(2, currencyAccountID);
             statement.executeUpdate();
+
+            this.balances.set(getIndex(currencyAccountID), balance);
             isSuccess = true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -67,7 +71,6 @@ public class BankAccountImpl implements BankAccount {
 
     @Override
     public boolean setCurrency(String currency, String currencyAccountID) {
-        this.currencies.set(getIndex(currencyAccountID), currency);
         boolean isSuccess;
         String sql = "UPDATE bankaccount SET currency=? WHERE currencyaccountID=?";
 
@@ -75,6 +78,8 @@ public class BankAccountImpl implements BankAccount {
             statement.setString(1, currency);
             statement.setString(2, currencyAccountID);
             statement.executeUpdate();
+
+            this.currencies.set(getIndex(currencyAccountID), currency);
             isSuccess = true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -126,7 +131,7 @@ public class BankAccountImpl implements BankAccount {
         }
 
         setBalance(balance.subtract(amount), currencyAccountID);
-        addAction(accountID, "withdraw " + amount + " c.u. from " + currencyAccountID);
+        addAction(accountID, "withdraw",amount + " c.u.", currencyAccountID);
 
         return true;
     }
@@ -140,7 +145,7 @@ public class BankAccountImpl implements BankAccount {
 
         BigDecimal balance = getBalance(currencyAccountID);
         setBalance(balance.add(amount), currencyAccountID);
-        addAction(accountID, "deposit " + amount + " c.u. from " + currencyAccountID);
+        addAction(accountID, "deposit",amount + " c.u.", currencyAccountID);
 
         return true;
     }
@@ -149,7 +154,8 @@ public class BankAccountImpl implements BankAccount {
     public boolean loadData(String accountID) {
         boolean isSuccess;
         clearData();
-        String sql = "SELECT currencyaccountID, balance, currency FROM bankaccount WHERE accountID=? ORDER BY currencyaccountID";
+        String sql = "SELECT currencyaccountID, balance, currency FROM bankaccount WHERE accountID=? " +
+                "ORDER BY currencyaccountID";
 
         try (PreparedStatement statement = con.prepareStatement(sql)) {
             statement.setString(1, accountID);
@@ -171,9 +177,16 @@ public class BankAccountImpl implements BankAccount {
     }
 
     @Override
-    public boolean addAction(String accountID, String note) {
+    public boolean addAction(String accountID, String action, String note, String currencyAccountID) {
+        if (!availableActions.contains(action)) {
+            JOptionPane.showMessageDialog(null,
+                    "Error --> Cannot Create an Action Note of Such type " + action +"!");
+            return false;
+        }
+
         boolean isSuccess;
-        String sql = "INSERT INTO activity(accountID, actionID, action, actiondatetime) VALUES(?, ?, ?, ?)";
+        String sql = "INSERT INTO activity(accountID, actionID, comment, actiondatetime, action, currencyaccountID) " +
+                "VALUES(?, ?, ?, ?, ?, ?)";
 
         List<String> actionIDs = getActionIDs(accountID);
         if (actionIDs.isEmpty()) {
@@ -190,6 +203,8 @@ public class BankAccountImpl implements BankAccount {
             statement.setString(2, actionID);
             statement.setString(3, note);
             statement.setString(4, currentTime);
+            statement.setString(5, action);
+            statement.setString(6, currencyAccountID);
             statement.executeUpdate();
             isSuccess = true;
         } catch (Exception e) {
@@ -203,14 +218,22 @@ public class BankAccountImpl implements BankAccount {
     @Override
     public List<String> getActions(String accountID) {
         List<String> result = new ArrayList<>();
-        String sql = "SELECT actionID, action, actiondatetime FROM activity WHERE accountID=? ORDER BY actiondatetime";
+        String sql = "SELECT actionID, comment, actiondatetime, action, currencyaccountID FROM activity WHERE accountID=? " +
+                "ORDER BY actiondatetime";
 
         try (PreparedStatement statement = con.prepareStatement(sql)) {
             statement.setString(1, accountID);
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
-                    result.add(rs.getString("actionID") + " - " + rs.getString("action") +
-                               " - " + rs.getString("actiondatetime"));
+                    String caID = rs.getString("currencyaccountID");
+                    if (caID == null) {
+                        caID = "";
+                    }
+                    result.add(rs.getString("actionID") + " - " +
+                               rs.getString("action") + " - " +
+                               rs.getString("comment") + " - " +
+                               caID + " - " +
+                               rs.getString("actiondatetime"));
                 }
             }
         } catch (Exception e) {

@@ -316,10 +316,10 @@ class Admin extends JFrame implements ActionListener {
     private void updateInfo(ChequingAccount user) throws Exception {
         Boolean[] isSuccess = new Boolean[4];
 
-        isSuccess[0] = user.setName(nameTextField.getText());
-        isSuccess[1] = user.setLastName(lastNameTextField.getText());
-        isSuccess[2] = user.setSIN(SINTextField.getText());
-        isSuccess[3] = user.setBirthDate(birthDateTextField.getText());
+        isSuccess[0] = user.setName(nameTextField.getText(), true);
+        isSuccess[1] = user.setLastName(lastNameTextField.getText(), true);
+        isSuccess[2] = user.setSIN(SINTextField.getText(), true);
+        isSuccess[3] = user.setBirthDate(birthDateTextField.getText(), true);
 
         for (Boolean element : isSuccess) {
             if (!element) {

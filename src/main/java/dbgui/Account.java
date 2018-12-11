@@ -6,17 +6,16 @@ import java.util.List;
 
 
 public interface Account {
-	//Setters
-	boolean setName(String name);
-    boolean setLastName(String lastName);
-    boolean setBirthDate(String birthDate);
-    boolean setSIN(String SIN);
-    boolean setID(String ID); //admin
+    boolean setName(String name, boolean makeNote);
+    boolean setLastName(String lastName, boolean makeNote);
+    boolean setBirthDate(String birthDate, boolean makeNote);
+    boolean setBirthDate(Date birthDate, boolean makeNote);
+    boolean setSIN(String SIN, boolean makeNote);
+    boolean setID(String ID);
     boolean setBalance(BigDecimal balance, String currencyAccountID);
     boolean setCurrency(String currency, String currencyAccountID);
-    boolean setLastActivity(String lastActivity);//auto
+    boolean setLastActivity(java.util.Date lastActivity); // auto
 
-	// Getters
 	String getName();
 	String getLastName();
 	Date getBirthDate();

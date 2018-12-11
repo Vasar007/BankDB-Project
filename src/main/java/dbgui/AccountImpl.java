@@ -3,8 +3,6 @@ package dbgui;
 import javax.swing.*;
 import java.math.BigDecimal;
 import java.sql.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,14 +16,9 @@ import org.json.simple.JSONValue;
  */
 
 class AccountImpl implements Account{
-	private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-
-	private String ID;
-	private String SIN;
+    private String ID;
 	private String lastActivity;
-	private String name;
-	private String lastName;
-	private Date birthDate;
+	private ClientInfo clientInfo;
 	private BankAccount bankAccount;
 
 	private Connection con;
@@ -36,10 +29,9 @@ class AccountImpl implements Account{
 	 */
 	AccountImpl(String ID, boolean flag) {
 		// Create a connection to the Database
-		con = MySQLConnect.ConnectDB();
-		bankAccount = new BankAccountImpl(con);
+        init();
 
-		// load user data.
+		// Load user data
 		findUserName(ID);
 		loadUserData(ID);
 	}
@@ -49,20 +41,25 @@ class AccountImpl implements Account{
 	 */
 	AccountImpl(String username) {
 		// Create a connection to the Database
-		con = MySQLConnect.ConnectDB();
-		bankAccount = new BankAccountImpl(con);
+        init();
 
 		// Load user data
 		findAccountID(username);
 		loadUserData(ID);
 	}
 
+	private void init() {
+        con = MySQLConnect.ConnectDB();
+        clientInfo = new ClientInfoImpl(con);
+        bankAccount = new BankAccountImpl(con);
+    }
+
 	/**
 	 * Finds the accountID of the given username
 	 * @param username of type String
      */
 	private void findAccountID(String username) {
-		String sql = "SELECT accountID FROM account WHERE username=? ORDER BY accountID";
+		String sql = "SELECT accountID FROM account WHERE username=?";
 
 		try (PreparedStatement statement = con.prepareStatement(sql)) {
 			statement.setString(1, username);
@@ -93,20 +90,20 @@ class AccountImpl implements Account{
 			try (ResultSet rs = statement1.executeQuery()) {
 				while (rs.next()) {
 					// Retrieve by column name
-					SIN = rs.getString("SIN");
+					clientInfo.setSIN_NotLoadToDB(rs.getString("SIN"));
 					lastActivity = rs.getString("lastactivity");
 				}
 			}
 
 			try (PreparedStatement statement2 = con.prepareStatement(sql2)) {
-				statement2.setString(1, SIN);
+				statement2.setString(1, getSIN());
 
 				try (ResultSet rs = statement2.executeQuery()) {
 					while (rs.next()) {
 						// Retrieve by column name
-						name = rs.getString("name");
-						lastName = rs.getString("lastname");
-						birthDate = rs.getDate("birthdate");
+                        setName(rs.getString("name"), false);
+                        setLastName(rs.getString("lastname"), false);
+                        setBirthDate(rs.getDate("birthdate"), false);
 					}
 				}
 				bankAccount.loadData(ID);
@@ -155,32 +152,13 @@ class AccountImpl implements Account{
 	}
 
 	public void setUserData(String name, String lastName, String SIN, String ID, String lastActivity,
-                            String birthDate) throws Exception {
-		if (!name.matches("[A-Za-z]+")) {
-			throw new Exception("Name contains forbidden symbols!");
-		}
-		this.name = name;
-
-		if (!lastName.matches("[A-Za-z]+")) {
-			throw new Exception("Name contains forbidden symbols!");
-		}
-        this.lastName = lastName;
-
-		if (!SIN.matches("[0-9]{7}")) {
-			throw new Exception();
-		}
-        this.SIN = SIN;
-
+                            String birthDate) {
+		setName(name, false);
+		setLastName(lastName, false);
+		setSIN(SIN, false);
         this.ID = ID;
         this.lastActivity = lastActivity;
-
-        try {
-            java.util.Date parsed = format.parse(birthDate);
-            this.birthDate = new java.sql.Date(parsed.getTime());
-        } catch (ParseException e) {
-            e.printStackTrace();
-            throw new Exception("Wrong date format!");
-        }
+        setBirthDate(birthDate, false);
     }
 
 	public static Map<String, Object> getJSONMapFromResultSet(ResultSet rs, String keyName) {
@@ -242,7 +220,7 @@ class AccountImpl implements Account{
 			}
 
 			try (PreparedStatement statement4 = con.prepareStatement(sql4)) {
-				statement4.setString(1, SIN);
+				statement4.setString(1, getSIN());
 
 				try (ResultSet rs = statement4.executeQuery()) {
 					resultJson.putAll(getJSONMapFromResultSet(rs, "clientinfo"));
@@ -264,107 +242,56 @@ class AccountImpl implements Account{
 	}
 
 	@Override
-	public boolean setName(String name) {
-	 	boolean isSuccess;
-		String sql = "UPDATE clientinfo SET name=? WHERE SIN=?";
-
-		// Name must be alphabetical
-		 try (PreparedStatement statement = con.prepareStatement(sql)) {
-			 if (!name.matches("[A-Za-z]+")) {
-				 throw new Exception("Name contains forbidden symbols!");
-			 } else {
-				 this.name = name;
-
-				 statement.setString(1, name);
-				 statement.setString(2, SIN);
-				 statement.executeUpdate();
-
-				 isSuccess = true;
-			 }
-		 } catch (Exception e) {
-             e.printStackTrace();
-			 JOptionPane.showMessageDialog(null,"Error --> Cannot Update Name!");
-			 isSuccess = false;
-		 }
-		return isSuccess;
+	public boolean setName(String name, boolean makeNote) {
+	 	boolean result = clientInfo.setName(name);
+	 	if (result && makeNote) {
+	 	    bankAccount.addAction(ID, "update", "name", null);
+        }
+	 	return result;
 	 }
 
 	@Override
-	public boolean setLastName(String lastName) {
-	 	boolean isSuccess;
-		String sql = "UPDATE clientinfo SET lastname=? WHERE SIN=?";
-
-		 try (PreparedStatement statement = con.prepareStatement(sql)) {
-			 if (!lastName.matches("[A-Za-z]+")) {
-				 throw new Exception("Last name contains forbidden symbols!");
-			 } else {
-				 this.lastName = lastName;
-
-				 statement.setString(1, lastName);
-				 statement.setString(2, SIN);
-				 statement.executeUpdate();
-
-				 isSuccess = true;
-			 }
-		 } catch (Exception e) {
-             e.printStackTrace();
-			 JOptionPane.showMessageDialog(null,"Error --> Cannot Update Last Name!");
-			 isSuccess = false;
-		 }
-		 return isSuccess;
+	public boolean setLastName(String lastName, boolean makeNote) {
+        boolean result = clientInfo.setLastName(lastName);
+        if (result && makeNote) {
+            bankAccount.addAction(ID, "update", "last name", null);
+        }
+        return result;
 	 }
 
 	@Override
-	public boolean setBirthDate(String birthDate) {
-		boolean isSuccess;
-		String sql = "UPDATE clientinfo SET birthdate=? WHERE SIN=?";
-
-		try (PreparedStatement statement = con.prepareStatement(sql)) {
-			java.util.Date parsed = format.parse(birthDate);
-			this.birthDate = new java.sql.Date(parsed.getTime());
-
-			statement.setDate(1, this.birthDate);
-			statement.setString(2, SIN);
-			statement.executeUpdate();
-			isSuccess = true;
-		} catch (Exception e) {
-            e.printStackTrace();
-			JOptionPane.showMessageDialog(null,"Error --> Cannot Update Birth Date!");
-			isSuccess = false;
-		}
-		return isSuccess;
+	public boolean setBirthDate(String birthDate, boolean makeNote) {
+        boolean result = clientInfo.setBirthDate(birthDate);
+        if (result && makeNote) {
+            bankAccount.addAction(ID, "update", "birth date", null);
+        }
+        return result;
 	 }
+
+    @Override
+    public boolean setBirthDate(Date birthDate, boolean makeNote) {
+        boolean result = clientInfo.setBirthDate(birthDate);
+        if (result && makeNote) {
+            bankAccount.addAction(ID, "update", "birth date", null);
+        }
+        return result;
+    }
 
 	@Override
-	public boolean setSIN(String SIN) {
-		 boolean isSuccess;
-		String sql = "UPDATE bankdb SET SIN=? WHERE accountID=?";
-
-		 try (PreparedStatement statement = con.prepareStatement(sql)) {
-			 if (!SIN.matches("[0-9]{7}")) {
-				 throw new Exception();
-			 } else {
-				 statement.setString(1, SIN);
-				 statement.setString(2, ID);
-				 statement.executeUpdate();
-
-				 this.SIN = SIN;
-				 isSuccess = true;
-			 }
-		 } catch (Exception e) {
-             e.printStackTrace();
-			 JOptionPane.showMessageDialog(null,"Error --> Cannot Update SIN!");
-			 isSuccess = false;
-		 }
-		 return isSuccess;
-	 }
+	public boolean setSIN(String SIN, boolean makeNote) {
+        boolean result = clientInfo.setSIN(SIN);
+        if (result && makeNote) {
+            bankAccount.addAction(ID, "update", "SIN", null);
+        }
+        return result;
+	}
 
 	@Override
 	public boolean setID(String ID) {
- 		 this.ID = ID;
-		 loadUserData(ID);
-		 return true;
-	 }
+ 		this.ID = ID;
+		loadUserData(ID);
+		return true;
+	}
 
 	@Override
 	public boolean setBalance(BigDecimal balance, String currencyAccountID) {
@@ -377,47 +304,51 @@ class AccountImpl implements Account{
 	 }
 
 	@Override
-	public boolean setLastActivity(String lastActivity) {
-		 this.lastActivity = lastActivity;
+	public boolean setLastActivity(java.util.Date lastActivity) {
 		 boolean isSuccess;
-		String sql = "UPDATE bankdb SET lastactivity=? WHERE accountID=?";
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String currentTime = sdf.format(lastActivity);
+        this.lastActivity = currentTime;
 
-		 try (PreparedStatement statement = con.prepareStatement(sql)) {
-			 statement.setString(1, lastActivity);
-			 statement.setString(2, ID);
-			 statement.executeUpdate();
-			 isSuccess = true;
-		 } catch (SQLException e) {
-             e.printStackTrace();
-			 JOptionPane.showMessageDialog(null,"Error --> Cannot Update Last Activity!");
-			 isSuccess = false;
-		 }
-		 return isSuccess;
+        String sql = "UPDATE bankdb SET lastactivity=? WHERE accountID=?";
+
+        try (PreparedStatement statement = con.prepareStatement(sql)) {
+
+            statement.setString(1, currentTime);
+            statement.setString(2, ID);
+            statement.executeUpdate();
+            isSuccess = true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null,"Error --> Cannot Update Last Activity!");
+            isSuccess = false;
+		}
+		return isSuccess;
 	 }
 
 	@Override
 	public String getName() {
-		 return name;
+		return clientInfo.getName();
 	 }
 
 	@Override
 	public String getLastName() {
-		 return lastName;
+		return clientInfo.getLastName();
 	 }
 
 	@Override
 	public Date getBirthDate() {
-		 return birthDate;
+		return clientInfo.getBirthDate();
 	 }
 
 	@Override
 	public String getSIN() {
-		 return SIN;
+		return clientInfo.getSIN();
 	 }
 
 	@Override
 	public String getID() {
-		 return ID;
+		return ID;
 	 }
 
 	@Override
@@ -437,16 +368,19 @@ class AccountImpl implements Account{
 
 	@Override
 	public BigDecimal getBalance(String currencyAccountID) {
-		 return bankAccount.getBalance(currencyAccountID);
+		return bankAccount.getBalance(currencyAccountID);
 	 }
 
 	@Override
 	public String getCurrency(String currencyAccountID) {
-		return bankAccount.getCurrency(currencyAccountID);
+        return bankAccount.getCurrency(currencyAccountID);
 	}
 
 	@Override
 	public String getLastActivity() {
+	    if (lastActivity == null) {
+            return "None";
+        }
 	 	return lastActivity;
 	}
 
@@ -455,7 +389,7 @@ class AccountImpl implements Account{
 	 */
 	@Override
 	public boolean withdraw(BigDecimal amount, String currencyAccountID) {
-		return bankAccount.withdraw(amount, ID, currencyAccountID);
+        return bankAccount.withdraw(amount, ID, currencyAccountID);
 	}
 
 	/**
@@ -463,7 +397,7 @@ class AccountImpl implements Account{
 	 */
 	@Override
 	public boolean deposit(BigDecimal amount, String currencyAccountID) {
-		return bankAccount.deposit(amount, ID, currencyAccountID);
+        return bankAccount.deposit(amount, ID, currencyAccountID);
 	}
 
 	/**
@@ -479,22 +413,22 @@ class AccountImpl implements Account{
 		try (PreparedStatement statement1 = con.prepareStatement(sql1)) {
 			con.setAutoCommit(false);
 			statement1.setString(1, ID);
-			statement1.setString(2, SIN);
-			statement1.setString(3, "None");
+			statement1.setString(2, getSIN());
+			statement1.setString(3, null);
 			statement1.executeUpdate();
 
 			try (PreparedStatement statement2 = con.prepareStatement(sql2)) {
 				statement2.setString(1, ID);
-				statement2.setString(2, name.replace(" ", ""));
-				statement2.setString(3, SafetyPassword.hashPassword(SIN));
+				statement2.setString(2, getName().replace(" ", ""));
+				statement2.setString(3, SafetyPassword.hashPassword(getSIN()));
 				statement2.executeUpdate();
 			}
 
 			try (PreparedStatement statement3 = con.prepareStatement(sql3)) {
-				statement3.setString(1, name);
-				statement3.setString(2, lastName);
-				statement3.setDate(3, birthDate);
-				statement3.setString(4, SIN);
+				statement3.setString(1, getName());
+				statement3.setString(2, getLastName());
+				statement3.setDate(3, getBirthDate());
+				statement3.setString(4, getSIN());
 				statement3.executeUpdate();
 			}
 
@@ -550,7 +484,7 @@ class AccountImpl implements Account{
 			}
 
 			try (PreparedStatement statement4 = con.prepareStatement(sql4)) {
-				statement4.setString(1, SIN);
+				statement4.setString(1, getSIN());
 				statement4.executeUpdate();
 			}
 

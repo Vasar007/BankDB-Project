@@ -20,23 +20,23 @@ USE `mydb`;
 CREATE TABLE IF NOT EXISTS `mydb`.`bankdb` (
   `accountID` VARCHAR(11) NOT NULL,
   `SIN` VARCHAR(7) NOT NULL,
-  `lastactivity` VARCHAR(100) CHARACTER SET 'utf8' NOT NULL,
+  `lastactivity` DATETIME,
   PRIMARY KEY (`accountID`),
   UNIQUE KEY `accountID` (`accountID`),
   UNIQUE KEY `SIN_UNIQUE` (`SIN`))
   ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 INSERT INTO `mydb`.`bankdb` (`accountID`, `SIN`, `lastactivity`) VALUES
-('0',           '0',       'NA'),
-('20033112345', '1234567', 'Mon May 09 21:05:11 EDT 2016'),
-('45638912345', '1891751', 'Mon May 09 22:06:05 EDT 2016'),
-('42006412345', '9999999', 'Wed May 11 00:18:46 EDT 2016'),
-('45385012345', '1234568', 'None'),
-('61923012345', '1111111', 'None'),
-('30577412345', '2222222', 'None'),
-('63063112345', '8080808', 'Wed May 11 01:25:01 EDT 2016'),
-('50000012345', '4124125', 'None'),
-('70382512345', '2523626', 'None');
+('0',           '0',       NULL),
+('20033112345', '1234567', '2016-05-09 09 21:05:11'),
+('45638912345', '1891751', '2016-06-09 22:06:05'),
+('42006412345', '9999999', '2016-10-11 00:18:46'),
+('45385012345', '1234568', NULL),
+('61923012345', '1111111', NULL),
+('30577412345', '2222222', NULL),
+('63063112345', '8080808', '2017-12-12 01:25:01'),
+('50000012345', '4124125', NULL),
+('70382512345', '2523626', NULL);
 
 -- -----------------------------------------------------
 -- Table `mydb`.`account`
@@ -134,31 +134,40 @@ INSERT INTO `mydb`.`bankaccount` (`accountID`, `currencyaccountID`, `balance`, `
 CREATE TABLE IF NOT EXISTS `mydb`.`activity` (
   `accountID` VARCHAR(11) NOT NULL,
   `actionID` VARCHAR(15) NOT NULL,
-  `action` VARCHAR(50) NOT NULL,
+  `comment` VARCHAR(15) NOT NULL,
   `actiondatetime` DATETIME NOT NULL,
+  `currencyaccountID` VARCHAR(13),
+  `action` ENUM('deposit', 'withdraw', 'update', 'NA') NOT NULL,
   PRIMARY KEY (`actionID`),
   UNIQUE KEY `actionID` (`actionID`),
   CONSTRAINT `fk_accountID_ACC`
     FOREIGN KEY (`accountID`)
       REFERENCES `mydb`.`bankdb` (`accountID`)
       ON DELETE NO ACTION
+      ON UPDATE NO ACTION,
+  CONSTRAINT `fk_currencyaccountID_ACC`
+    FOREIGN KEY (`currencyaccountID`)
+      REFERENCES `mydb`.`bankaccount` (`currencyaccountID`)
+      ON DELETE NO ACTION
       ON UPDATE NO ACTION)
   ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-INSERT INTO `mydb`.`activity` (`accountID`, `actionID`, `action`, `actiondatetime`) VALUES
-('0',           '0',               'NA',                                   '1000-01-01 00:00:00'),
-('20033112345', '200331123450001', 'deposit 20 c.u. from 1234567000001',   '2018-12-01 00:01:29'),
-('20033112345', '200331123450002', 'withdraw 42 c.u. from 1234567000002',  '2018-12-11 00:02:34'),
-('45638912345', '456389123450001', 'withdraw 42 c.u. from 1891751000001',  '2018-11-05 07:05:38'),
-('42006412345', '420064123450001', 'withdraw 42 c.u. from 9999999000001',  '2018-11-25 08:05:36'),
-('45385012345', '453850123450001', 'withdraw 42 c.u. from 1234568000001',  '2018-11-26 23:35:39'),
-('61923012345', '619230123450001', 'withdraw 42 c.u. from 1111111000001',  '2018-11-21 09:35:35'),
-('30577412345', '305774123450001', 'withdraw 42 c.u. from 2222222000001',  '2018-12-01 12:35:59'),
-('63063112345', '630631123450001', 'deposit 20 c.u. from 8080808000001',   '2018-10-04 13:39:00'),
-('63063112345', '630631123450002', 'deposit 55 c.u. from 8080808000002',   '2018-10-13 14:32:59'),
-('63063112345', '630631123450003', 'deposit 19 c.u. from 8080808000003',   '2018-10-12 15:59:50'),
-('50000012345', '500000123450001', 'deposit 1000 c.u. from 4124125000001', '2018-10-14 15:02:54'),
-('70382512345', '703825123450001', 'deposit 102 c.u. from 2523626000001',  '2018-12-11 00:02:54');
+INSERT INTO `mydb`.`activity` (`accountID`, `actionID`, `comment`, `actiondatetime`, `currencyaccountID`, `action`) VALUES
+('0',           '0',               'NA',        '1000-01-01 00:00:00', NULL,            'NA'),
+('20033112345', '200331123450001', '20 c.u.',   '2018-12-01 00:01:29', '1234567000001', 'deposit'),
+('20033112345', '200331123450002', '42 c.u.',   '2018-12-11 00:02:34', '1234567000002', 'withdraw'),
+('45638912345', '456389123450001', '42 c.u.',   '2018-11-05 07:05:38', '1891751000001', 'withdraw'),
+('42006412345', '420064123450001', '42 c.u.',   '2018-11-25 08:05:36', '9999999000001', 'withdraw'),
+('45385012345', '453850123450001', '42 c.u.',   '2018-11-26 23:35:39', '1234568000001', 'withdraw'),
+('61923012345', '619230123450001', '42 c.u.',   '2018-11-21 09:35:35', '1111111000001', 'withdraw'),
+('61923012345', '619230123450002', 'name',      '2018-09-18 20:28:09', NULL,             'update'),
+('61923012345', '619230123450003', 'last name', '2018-11-19 10:45:00', NULL,             'update'),
+('30577412345', '305774123450001', '42 c.u.',   '2018-12-01 12:35:59', '2222222000001', 'withdraw'),
+('63063112345', '630631123450001', '20 c.u.',   '2018-10-04 13:39:00', '8080808000001', 'deposit'),
+('63063112345', '630631123450002', '55 c.u.',   '2018-10-13 14:32:59', '8080808000002', 'deposit'),
+('63063112345', '630631123450003', '19 c.u.',   '2018-10-12 15:59:50', '8080808000003', 'deposit'),
+('50000012345', '500000123450001', '1000 c.u.', '2018-10-14 15:02:54', '4124125000001', 'deposit'),
+('70382512345', '703825123450001', '102 c.u.',  '2018-12-11 00:02:54', '2523626000001', 'deposit');
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

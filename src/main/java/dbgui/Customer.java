@@ -319,6 +319,10 @@ class Customer extends JFrame implements ActionListener {
 
         this.add(topPanel,BorderLayout.PAGE_START);
         this.add(midPanel,BorderLayout.CENTER);
+
+        Date date = new Date();
+        user.setLastActivity(date);
+        lastActivityLabel.setText(user.getLastActivity());
     }
 
     private void toggleBankAccountButtons(boolean flag) {
@@ -338,11 +342,7 @@ class Customer extends JFrame implements ActionListener {
      * @param event of type ActionEvent
      */
     private void eventHandler(ActionEvent event) {
-        Date date = new Date();
-        user.setLastActivity(date.toString());
-        lastActivityLabel.setText(user.getLastActivity());
-
-        // Event 2 ---> Admin Clicks on the Selection Box and choose account
+        // Event 1 ---> Customer Clicks on the Selection Box and choose account
         if ("ACCOUNTLIST".equals(event.getActionCommand())) {
             JComboBox<String> cb = (JComboBox<String>) event.getSource();
 
@@ -374,25 +374,25 @@ class Customer extends JFrame implements ActionListener {
         }
 
         else if ("NAME".equals(event.getActionCommand())) {
-            boolean isSuccess = user.setName(nameTextField.getText());
+            boolean isSuccess = user.setName(nameTextField.getText(), true);
             if (isSuccess) updateNameButton.setBackground(successColor);
             else updateNameButton.setBackground(failureColor);
         }
 
         else if ("LASTNAME".equals(event.getActionCommand())) {
-            boolean isSuccess = user.setLastName(lastNameTextField.getText());
+            boolean isSuccess = user.setLastName(lastNameTextField.getText(), true);
             if (isSuccess) updateLastNameButton.setBackground(successColor);
             else updateLastNameButton.setBackground(failureColor);
         }
 
         else if ("SIN".equals(event.getActionCommand())) {
-            boolean isSuccess = user.setSIN(SINTextField.getText());
+            boolean isSuccess = user.setSIN(SINTextField.getText(), true);
             if (isSuccess) updateSINButton.setBackground(successColor);
             else updateSINButton.setBackground(failureColor);
         }
 
         else if ("DATE".equals(event.getActionCommand())) {
-            boolean isSuccess = user.setBirthDate(birthDateTextField.getText());
+            boolean isSuccess = user.setBirthDate(birthDateTextField.getText(), true);
             if (isSuccess) updateBirthDateButton.setBackground(successColor);
             else updateBirthDateButton.setBackground(failureColor);
         }

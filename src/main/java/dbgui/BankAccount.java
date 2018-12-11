@@ -5,11 +5,9 @@ import java.util.List;
 
 
 public interface BankAccount {
-    //Setters
     boolean setBalance(BigDecimal balance, String currencyAccountID);
     boolean setCurrency(String currency, String currencyAccountID);
 
-    // Getters
     List<String> getCurrencyAccountIDs();
     List<BigDecimal> getAllBalances();
     List<String> getAllCurrencies();
@@ -21,7 +19,7 @@ public interface BankAccount {
 
     boolean loadData(String accountID);
 
-    boolean addAction(String accountID, String note);
+    boolean addAction(String accountID, String action,String note, String currencyAccountID);
     List<String> getActions(String accountID);
     List<String> getActionIDs(String accountID);
 

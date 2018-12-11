@@ -239,7 +239,7 @@ class UserInterface extends JPanel implements ActionListener {
                  }
             } catch (Exception e) {
                 e.printStackTrace();
-                JOptionPane.showMessageDialog(null, "Error --> Login Error..");
+                JOptionPane.showMessageDialog(null, "Error --> Login Error.");
             }
         }
     }
