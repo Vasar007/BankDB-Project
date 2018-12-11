@@ -131,7 +131,7 @@ public class BankAccountImpl implements BankAccount {
         }
 
         setBalance(balance.subtract(amount), currencyAccountID);
-        addAction(accountID, "withdraw",amount + " c.u.", currencyAccountID);
+        addAction(accountID, "withdraw","c.u.", currencyAccountID, amount);
 
         return true;
     }
@@ -145,7 +145,7 @@ public class BankAccountImpl implements BankAccount {
 
         BigDecimal balance = getBalance(currencyAccountID);
         setBalance(balance.add(amount), currencyAccountID);
-        addAction(accountID, "deposit",amount + " c.u.", currencyAccountID);
+        addAction(accountID, "deposit","c.u.", currencyAccountID, amount);
 
         return true;
     }
@@ -177,7 +177,7 @@ public class BankAccountImpl implements BankAccount {
     }
 
     @Override
-    public boolean addAction(String accountID, String action, String note, String currencyAccountID) {
+    public boolean addAction(String accountID, String action, String note, String currencyAccountID, BigDecimal amount) {
         if (!availableActions.contains(action)) {
             JOptionPane.showMessageDialog(null,
                     "Error --> Cannot Create an Action Note of Such type " + action +"!");
@@ -185,8 +185,8 @@ public class BankAccountImpl implements BankAccount {
         }
 
         boolean isSuccess;
-        String sql = "INSERT INTO activity(accountID, actionID, comment, actiondatetime, action, currencyaccountID) " +
-                "VALUES(?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO activity(accountID, actionID, comment, actiondatetime, action, currencyaccountID, amount) " +
+                "VALUES(?, ?, ?, ?, ?, ?, ?)";
 
         List<String> actionIDs = getActionIDs(accountID);
         if (actionIDs.isEmpty()) {
@@ -205,6 +205,7 @@ public class BankAccountImpl implements BankAccount {
             statement.setString(4, currentTime);
             statement.setString(5, action);
             statement.setString(6, currencyAccountID);
+            statement.setBigDecimal(7, amount);
             statement.executeUpdate();
             isSuccess = true;
         } catch (Exception e) {
@@ -218,7 +219,7 @@ public class BankAccountImpl implements BankAccount {
     @Override
     public List<String> getActions(String accountID) {
         List<String> result = new ArrayList<>();
-        String sql = "SELECT actionID, comment, actiondatetime, action, currencyaccountID FROM activity WHERE accountID=? " +
+        String sql = "SELECT actionID, comment, actiondatetime, action, currencyaccountID, amount FROM activity WHERE accountID=? " +
                 "ORDER BY actiondatetime";
 
         try (PreparedStatement statement = con.prepareStatement(sql)) {
@@ -227,10 +228,15 @@ public class BankAccountImpl implements BankAccount {
                 while (rs.next()) {
                     String caID = rs.getString("currencyaccountID");
                     if (caID == null) {
-                        caID = "";
+                        caID = "None";
+                    }
+                    String amount = rs.getString("amount");
+                    if (amount == null) {
+                        amount = "None";
                     }
                     result.add(rs.getString("actionID") + " - " +
                                rs.getString("action") + " - " +
+                               amount + " - " +
                                rs.getString("comment") + " - " +
                                caID + " - " +
                                rs.getString("actiondatetime"));
@@ -240,6 +246,46 @@ public class BankAccountImpl implements BankAccount {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null,"Error --> Cannot Get Actions Data!");
         }
+        return result;
+    }
+
+    @Override
+    public List<String> getPaymentActions(String accountID, String currencyAccountID) {
+        List<String> result = new ArrayList<>();
+        BigDecimal resultDeposit = BigDecimal.ZERO;
+        BigDecimal resultWithdraw = BigDecimal.ZERO;
+
+        String sql = "SELECT actionID, comment, actiondatetime, action, amount FROM activity " +
+                "WHERE accountID=? AND currencyaccountID=? ORDER BY actiondatetime";
+
+        try (PreparedStatement statement = con.prepareStatement(sql)) {
+            statement.setString(1, accountID);
+            statement.setString(2, currencyAccountID);
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    String action = rs.getString("action");
+                    BigDecimal amount = rs.getBigDecimal("amount");
+                    result.add(rs.getString("actionID") + " - " +
+                            action + " - " +
+                            amount.toString() + " - " +
+                            rs.getString("comment") + " - " +
+                            currencyAccountID + " - " +
+                            rs.getString("actiondatetime"));
+
+                    if (action.equals("deposit")) {
+                        resultDeposit = resultDeposit.add(amount);
+                    } else if (action.equals("withdraw")) {
+                        resultWithdraw = resultWithdraw.add(amount);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null,"Error --> Cannot Get Actions Data!");
+        }
+
+        result.add("\nTotal amount of deposit actions: " + resultDeposit.toString());
+        result.add("\nTotal amount of withdraw actions: " + resultWithdraw.toString());
         return result;
     }
 

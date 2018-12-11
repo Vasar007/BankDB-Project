@@ -526,7 +526,8 @@ class Admin extends JFrame implements ActionListener {
                     break;
                 default:
                     int response = JOptionPane.showConfirmDialog(null,
-                            "Delete " + user.findUserName(user.getID()) + " ?");
+                            "Delete " + user.findUserName(user.getID()) + " ?",
+                            "Delete Confirmation", JOptionPane.YES_NO_OPTION);
 
                     if (response == JOptionPane.OK_OPTION) {
                         JOptionPane.showMessageDialog(null,
@@ -551,7 +552,8 @@ class Admin extends JFrame implements ActionListener {
                     break;
                 default:
                     int response = JOptionPane.showConfirmDialog(null,
-                            "Delete Customer Account " + selectUserBankAccount + " ?");
+                            "Delete Customer Account " + selectUserBankAccount + " ?",
+                            "Delete Confirmation", JOptionPane.YES_NO_OPTION);
 
                     if (response == JOptionPane.OK_OPTION) {
                         JOptionPane.showMessageDialog(null,

@@ -39,4 +39,5 @@ public interface Account {
 	boolean deleteBankAccount(String currencyAccountID);
 
 	List<String> getActions();
+	List<String> getPaymentActions(String currencyAccountID);
 }

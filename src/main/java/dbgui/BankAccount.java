@@ -19,8 +19,9 @@ public interface BankAccount {
 
     boolean loadData(String accountID);
 
-    boolean addAction(String accountID, String action,String note, String currencyAccountID);
+    boolean addAction(String accountID, String action,String note, String currencyAccountID, BigDecimal amount);
     List<String> getActions(String accountID);
+    List<String> getPaymentActions(String accountID, String currencyAccountID);
     List<String> getActionIDs(String accountID);
 
     boolean createAccount(String accountID, String newCurrencyAccountID, BigDecimal balance, String currency);

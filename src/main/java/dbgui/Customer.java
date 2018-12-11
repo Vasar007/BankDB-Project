@@ -12,7 +12,6 @@ import java.util.Date;
 
 
 class Customer extends JFrame implements ActionListener {
-
     private static final Color backgroundColor = Color.WHITE;
     private static final Color foregroundColor = Color.BLACK;
     private static final Color successColor = Color.GREEN;
@@ -35,6 +34,7 @@ class Customer extends JFrame implements ActionListener {
     private JButton updateBirthDateButton;
     private JButton depositButton;
     private JButton withdrawButton;
+    private JButton countPaymentButton;
     private JLabel IDLabel;
     private JLabel lastActivityLabel;
     private JLabel balanceLabel;
@@ -81,7 +81,7 @@ class Customer extends JFrame implements ActionListener {
      * Initializes and creates all the visual elements required for this Frame
      */
     private void initialize() {
-        setSize(500, 850);
+        setSize(550, 850);
         setResizable(false);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
@@ -90,7 +90,7 @@ class Customer extends JFrame implements ActionListener {
         JPanel balancePanel = new JPanel();
         JPanel selectPanel = new JPanel();
         selectPanel.setLayout(new GridLayout(2, 2,1,1));
-        infoPanel.setLayout(new GridLayout(5, 1,1,1));
+        infoPanel.setLayout(new GridLayout(6, 1,1,1));
         balancePanel.setLayout(new GridLayout(4, 1,1,1));
 
         // Top image
@@ -121,7 +121,9 @@ class Customer extends JFrame implements ActionListener {
 
         selectPanel.add(logout);
 
-        // JSON Button
+        // Additional Buttons
+        JPanel helpPanel = new JPanel();
+
         JButton jsonButton = new JButton("Out JSON");
         jsonButton.setFont(sansSerifBold);
         jsonButton.setBackground(foregroundColor);
@@ -131,18 +133,27 @@ class Customer extends JFrame implements ActionListener {
         jsonButton.setActionCommand("OUTJSON");
         jsonButton.addActionListener(this);
 
-        JButton historyButton = new JButton("Show History");
-        historyButton.setFont(sansSerifBold);
-        historyButton.setBackground(foregroundColor);
-        historyButton.setForeground(backgroundColor);
-        historyButton.setPreferredSize(new Dimension(140,40));
-        historyButton.setSize(new Dimension(10, 10));
-        historyButton.setActionCommand("HISTORY");
-        historyButton.addActionListener(this);
+        JButton allHistoryButton = new JButton("Show All History");
+        allHistoryButton.setFont(sansSerifBold);
+        allHistoryButton.setBackground(foregroundColor);
+        allHistoryButton.setForeground(backgroundColor);
+        allHistoryButton.setPreferredSize(new Dimension(150,40));
+        allHistoryButton.setSize(new Dimension(10, 10));
+        allHistoryButton.setActionCommand("ALLHISTORY");
+        allHistoryButton.addActionListener(this);
+
+        countPaymentButton = new JButton("Show Payment History");
+        countPaymentButton.setFont(sansSerifBold);
+        countPaymentButton.setBackground(foregroundColor);
+        countPaymentButton.setForeground(backgroundColor);
+        countPaymentButton.setPreferredSize(new Dimension(200,40));
+        countPaymentButton.setSize(new Dimension(10, 10));
+        countPaymentButton.setActionCommand("PAYMENTHISTORY");
+        countPaymentButton.addActionListener(this);
+        countPaymentButton.setEnabled(false);
 
         // Line1 (AccountID)
         JPanel accountPanel = new JPanel();
-        accountPanel.setLayout(new GridLayout(2, 2,1,1));
 
         ArrayList<String> customerBankAccounts = MySQLConnect.getCustomersBankAccounts(user.getID());
 
@@ -160,8 +171,10 @@ class Customer extends JFrame implements ActionListener {
         IDLabel = new JLabel("N/A");
         accID.setFont(sansSerifBoldBig);
         IDLabel.setFont(sansSerifBoldBig);
-        accountPanel.add(jsonButton);
-        accountPanel.add(historyButton);
+
+        helpPanel.add(jsonButton);
+        helpPanel.add(allHistoryButton);
+        helpPanel.add(countPaymentButton);
         accountPanel.add(accID);
         accountPanel.add(IDLabel);
 
@@ -303,6 +316,7 @@ class Customer extends JFrame implements ActionListener {
         lastActivityFiledPanel.add(lastActivityLabel);
 
         JPanel midPanel = new JPanel();
+        infoPanel.add(helpPanel);
         infoPanel.add(accountPanel);
         infoPanel.add(namePanel);
         infoPanel.add(lastActivityPanel);
@@ -317,8 +331,8 @@ class Customer extends JFrame implements ActionListener {
         midPanel.add(infoPanel);
         midPanel.add(balancePanel);
 
-        this.add(topPanel,BorderLayout.PAGE_START);
-        this.add(midPanel,BorderLayout.CENTER);
+        this.add(topPanel, BorderLayout.PAGE_START);
+        this.add(midPanel, BorderLayout.CENTER);
 
         Date date = new Date();
         user.setLastActivity(date);
@@ -330,6 +344,7 @@ class Customer extends JFrame implements ActionListener {
         withdrawTextField.setEnabled(flag);
         depositButton.setEnabled(flag);
         withdrawButton.setEnabled(flag);
+        countPaymentButton.setEnabled(flag);
     }
 
     @Override
@@ -421,7 +436,7 @@ class Customer extends JFrame implements ActionListener {
 
         else if ("OUTJSON".equals(event.getActionCommand())) {
             // create a JTextArea
-            JTextArea textArea = new JTextArea(25, 100);
+            JTextArea textArea = new JTextArea(25, 150);
             textArea.setLineWrap(true);
             textArea.setText(user.getJSON()
                     .replace("},", "},\n\t")
@@ -437,8 +452,15 @@ class Customer extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(null, scrollPane);
         }
 
-        else if ("HISTORY".equals(event.getActionCommand())) {
+        else if ("ALLHISTORY".equals(event.getActionCommand())) {
             List<String> result = user.getActions();
+            String output = String.join("\n", result);
+            if (output.isEmpty()) output = "No Activity Found.";
+            JOptionPane.showMessageDialog(null, output);
+        }
+
+        else if ("PAYMENTHISTORY".equals(event.getActionCommand())) {
+            List<String> result = user.getPaymentActions(selectUserBankAccount);
             String output = String.join("\n", result);
             if (output.isEmpty()) output = "No Activity Found.";
             JOptionPane.showMessageDialog(null, output);

@@ -245,7 +245,7 @@ class AccountImpl implements Account{
 	public boolean setName(String name, boolean makeNote) {
 	 	boolean result = clientInfo.setName(name);
 	 	if (result && makeNote) {
-	 	    bankAccount.addAction(ID, "update", "name", null);
+	 	    bankAccount.addAction(ID, "update", "name", null, null);
         }
 	 	return result;
 	 }
@@ -254,7 +254,7 @@ class AccountImpl implements Account{
 	public boolean setLastName(String lastName, boolean makeNote) {
         boolean result = clientInfo.setLastName(lastName);
         if (result && makeNote) {
-            bankAccount.addAction(ID, "update", "last name", null);
+            bankAccount.addAction(ID, "update", "last name", null, null);
         }
         return result;
 	 }
@@ -263,7 +263,7 @@ class AccountImpl implements Account{
 	public boolean setBirthDate(String birthDate, boolean makeNote) {
         boolean result = clientInfo.setBirthDate(birthDate);
         if (result && makeNote) {
-            bankAccount.addAction(ID, "update", "birth date", null);
+            bankAccount.addAction(ID, "update", "birth date", null, null);
         }
         return result;
 	 }
@@ -272,7 +272,7 @@ class AccountImpl implements Account{
     public boolean setBirthDate(Date birthDate, boolean makeNote) {
         boolean result = clientInfo.setBirthDate(birthDate);
         if (result && makeNote) {
-            bankAccount.addAction(ID, "update", "birth date", null);
+            bankAccount.addAction(ID, "update", "birth date", null, null);
         }
         return result;
     }
@@ -281,7 +281,7 @@ class AccountImpl implements Account{
 	public boolean setSIN(String SIN, boolean makeNote) {
         boolean result = clientInfo.setSIN(SIN);
         if (result && makeNote) {
-            bankAccount.addAction(ID, "update", "SIN", null);
+            bankAccount.addAction(ID, "update", "SIN", null, null);
         }
         return result;
 	}
@@ -518,8 +518,7 @@ class AccountImpl implements Account{
 	}
 
 	@Override
-	public boolean createBankAccount(String newCurrencyAccountID, BigDecimal balance,
-							         String currency) {
+	public boolean createBankAccount(String newCurrencyAccountID, BigDecimal balance, String currency) {
 		return bankAccount.createAccount(ID, newCurrencyAccountID, balance, currency);
 	}
 
@@ -536,5 +535,10 @@ class AccountImpl implements Account{
 	@Override
 	public List<String> getActions() {
 		return bankAccount.getActions(ID);
+	}
+
+	@Override
+	public List<String> getPaymentActions(String currencyAccountID) {
+		return bankAccount.getPaymentActions(ID, currencyAccountID);
 	}
 }
