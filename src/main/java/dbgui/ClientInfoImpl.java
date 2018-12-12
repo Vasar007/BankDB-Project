@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Objects;
 
@@ -121,23 +122,45 @@ public class ClientInfoImpl implements ClientInfo {
         }
 
         boolean isSuccess;
-        String sql = "UPDATE bankdb SET SIN=? WHERE SIN=?";
+        String sql1 = "UPDATE bankdb SET SIN=? WHERE SIN=?";
+        String sql2 = "UPDATE clientinfo SET SIN=? WHERE SIN=?";
 
-        try (PreparedStatement statement = con.prepareStatement(sql)) {
+        try (PreparedStatement statement1 = con.prepareStatement(sql1)) {
             if (!SIN.matches("[0-9]{7}")) {
                 throw new Exception();
             } else {
-                statement.setString(1, SIN);
-                statement.setString(2, this.SIN);
-                statement.executeUpdate();
+                con.setAutoCommit(false);
+                statement1.setString(1, SIN);
+                statement1.setString(2, this.SIN);
+                statement1.executeUpdate();
 
+                try (PreparedStatement statement2 = con.prepareStatement(sql2)) {
+                    statement2.setString(1, SIN);
+                    statement2.setString(2, this.SIN);
+                    statement2.executeUpdate();
+                }
+
+                con.commit();
                 this.SIN = SIN;
                 isSuccess = true;
             }
         } catch (Exception e) {
             e.printStackTrace();
+            try {
+                System.err.print("Transaction is being rolled back");
+                con.rollback();
+            } catch(SQLException ex) {
+                ex.printStackTrace();
+            }
+
             JOptionPane.showMessageDialog(null,"Error --> Cannot Update SIN!");
             isSuccess = false;
+        } finally {
+            try {
+                con.setAutoCommit(true);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return isSuccess;
     }

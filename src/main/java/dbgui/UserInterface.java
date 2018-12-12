@@ -22,7 +22,7 @@ class UserInterface extends JPanel implements ActionListener {
     private static JFrame frame;
     private JLabel picture;
     private JPasswordField passwordField;
-    private JFormattedTextField username;
+    private JFormattedTextField usernameField;
     private JProgressBar progress;
     private JLabel status;
     private ImageIcon online;
@@ -109,16 +109,16 @@ class UserInterface extends JPanel implements ActionListener {
         passwordField.setActionCommand("ENTER");
         passwordField.addActionListener(this);
 
-        //Set up the username field
-        username = new JFormattedTextField();
-        username.setHorizontalAlignment(SwingConstants.CENTER);
-        username.setBorder(BorderFactory.createTitledBorder(new TitledBorder("User Name:")));
-        username.setBackground(backgroundColor);
-        username.setForeground(foregroundColor);
-        username.setSelectedTextColor(backgroundColor);
-        username.setSelectionColor(foregroundColor);
-        username.setActionCommand("ENTER");
-        username.addActionListener(this);
+        //Set up the usernameField field
+        usernameField = new JFormattedTextField();
+        usernameField.setHorizontalAlignment(SwingConstants.CENTER);
+        usernameField.setBorder(BorderFactory.createTitledBorder(new TitledBorder("User Name:")));
+        usernameField.setBackground(backgroundColor);
+        usernameField.setForeground(foregroundColor);
+        usernameField.setSelectedTextColor(backgroundColor);
+        usernameField.setSelectionColor(foregroundColor);
+        usernameField.setActionCommand("ENTER");
+        usernameField.addActionListener(this);
 
         // Create and set up the login button
         JButton login = new JButton();
@@ -149,7 +149,7 @@ class UserInterface extends JPanel implements ActionListener {
 
         authPanel.add(list);
         authPanel.add(pad1);
-        authPanel.add(username,BOTTOM_ALIGNMENT);
+        authPanel.add(usernameField,BOTTOM_ALIGNMENT);
         authPanel.add(passwordField,BOTTOM_ALIGNMENT);
         rightPanel.add(status,LEFT_ALIGNMENT);
         rightPanel.add(picture, LEFT_ALIGNMENT);
@@ -197,8 +197,11 @@ class UserInterface extends JPanel implements ActionListener {
 
             if (event.getSource() instanceof JComboBox) {
                 select = (String) cb.getSelectedItem();
-                assert select != null;
-                updateLabel(select);
+                if (select != null) {
+                    updateLabel(select);
+                    usernameField.setText("");
+                    passwordField.setText("");
+                }
             }
         }
 
@@ -213,7 +216,7 @@ class UserInterface extends JPanel implements ActionListener {
                  if (isLoginCorrect()) {
                      progressBar(true);
                      // If admin is logging in
-                     if (select.equals("Admin Login") && username.getText().equals("admin")) {
+                     if (select.equals("Admin Login") && usernameField.getText().equals("admin")) {
                          // Close the current page and move to the Admin Panel
                          Admin admin = new Admin(frame);
                          admin.setVisible(true);
@@ -221,13 +224,13 @@ class UserInterface extends JPanel implements ActionListener {
                          frame.setVisible(false);
                          con.close();  // close the connection
                          con = null;
-                     } else if (select.equals("Admin Login") && !username.getText().equals("admin")) {
+                     } else if (select.equals("Admin Login") && !usernameField.getText().equals("admin")) {
                          cannotLogin();
                      }
                      // If admin or customers are logging in
-                     else if (select.equals("Customer Login")&& !username.getText().equals("admin")) {
+                     else if (select.equals("Customer Login")&& !usernameField.getText().equals("admin")) {
                          // Close the current page and move to the Admin Panel
-                         Customer customer = new Customer(username.getText(), frame);
+                         Customer customer = new Customer(usernameField.getText(), frame);
                          customer.setVisible(true);
 //                         close(frame);
                          frame.setVisible(false);
@@ -283,7 +286,7 @@ class UserInterface extends JPanel implements ActionListener {
         try {
             String sql = "SELECT password FROM  account WHERE username=?";
             PreparedStatement statement = con.prepareStatement(sql);
-            statement.setString(1, username.getText());
+            statement.setString(1, usernameField.getText());
 
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next()) {
