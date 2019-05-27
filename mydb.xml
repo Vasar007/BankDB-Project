@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+- phpMyAdmin XML Dump
+- version 4.8.3
+- https://www.phpmyadmin.net
+-
+- Хост: 127.0.0.1:3306
+- Время создания: Дек 11 2018 г., 11:56
+- Версия сервера: 5.7.23
+- Версия PHP: 7.2.10
+-->
+
+<pma_xml_export version="1.0" xmlns:pma="https://www.phpmyadmin.net/some_doc_url/">
+    <!--
+    - Structure schemas
+    -->
+    <pma:structure_schemas>
+        <pma:database name="mydb" collation="utf8_general_ci" charset="utf8">
+            <pma:table name="account">
+                CREATE TABLE `account` (
+                  `accountID` varchar(11) NOT NULL,
+                  `username` varchar(16) NOT NULL,
+                  `password` varchar(128) NOT NULL,
+                  PRIMARY KEY (`username`),
+                  UNIQUE KEY `accountID_UNIQUE` (`accountID`),
+                  UNIQUE KEY `username` (`username`)
+                ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+            </pma:table>
+            <pma:table name="activity">
+                CREATE TABLE `activity` (
+                  `accountID` varchar(11) NOT NULL,
+                  `actionID` varchar(15) NOT NULL,
+                  `action` varchar(50) NOT NULL,
+                  `actiondatetime` datetime NOT NULL,
+                  PRIMARY KEY (`actionID`),
+                  UNIQUE KEY `actionID` (`actionID`),
+                  KEY `fk_accountID_ACC` (`accountID`)
+                ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+            </pma:table>
+            <pma:table name="bankaccount">
+                CREATE TABLE `bankaccount` (
+                  `accountID` varchar(11) NOT NULL,
+                  `currencyaccountID` varchar(13) NOT NULL,
+                  `balance` decimal(65,10) NOT NULL,
+                  `currency` varchar(10) NOT NULL,
+                  PRIMARY KEY (`currencyaccountID`),
+                  UNIQUE KEY `currencyaccountID` (`currencyaccountID`),
+                  KEY `fk_accountID_BA` (`accountID`)
+                ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+            </pma:table>
+            <pma:table name="bankdb">
+                CREATE TABLE `bankdb` (
+                  `accountID` varchar(11) NOT NULL,
+                  `SIN` varchar(7) NOT NULL,
+                  `lastactivity` varchar(100) NOT NULL,
+                  PRIMARY KEY (`accountID`),
+                  UNIQUE KEY `accountID` (`accountID`),
+                  UNIQUE KEY `SIN_UNIQUE` (`SIN`)
+                ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+            </pma:table>
+            <pma:table name="clientinfo">
+                CREATE TABLE `clientinfo` (
+                  `name` varchar(25) NOT NULL,
+                  `lastname` varchar(25) NOT NULL,
+                  `SIN` varchar(7) NOT NULL,
+                  `birthdate` date NOT NULL,
+                  PRIMARY KEY (`SIN`),
+                  UNIQUE KEY `SIN` (`SIN`)
+                ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+            </pma:table>
+        </pma:database>
+    </pma:structure_schemas>
+
+    <!--
+    - База данных: 'mydb'
+    -->
+    <database name="mydb">
+        <!-- Таблица account -->
+        <table name="account">
+            <column name="accountID">0</column>
+            <column name="username">admin</column>
+            <column name="password">$2a$10$dfpH/XruGxYxHgvyjb/OAOA4PRRcxnW6iz0RLleyt3w8J/OOrnsmi</column>
+        </table>
+        <table name="account">
+            <column name="accountID">20033112345</column>
+            <column name="username">berks</column>
+            <column name="password">$2a$10$BzxqhvHh8zSPCdAY65fT2uV/VeyyNTgOjRxm13xLycTMhonI052p2</column>
+        </table>
+        <table name="account">
+            <column name="accountID">45638912345</column>
+            <column name="username">johns</column>
+            <column name="password">$2a$10$gjyP1IwB9shgOlmBI5/nMu0PK7JAe6exwdeSU1cXom/2iWABr2L7K</column>
+        </table>
+        <table name="account">
+            <column name="accountID">42006412345</column>
+            <column name="username">Oliver</column>
+            <column name="password">$2a$10$sheazP1KkpszPXhgT928S.NfJNMLa83hJZdZAVYZCHjtwi1K155X2</column>
+        </table>
+        <table name="account">
+            <column name="accountID">45385012345</column>
+            <column name="username">deneme</column>
+            <column name="password">$2a$10$bN7z2koeTrMciZEXwnKi0OnJRY4aaZ5XvFEP/H4w/3zgaW3c6rzEG</column>
+        </table>
+        <table name="account">
+            <column name="accountID">61923012345</column>
+            <column name="username">NEW</column>
+            <column name="password">$2a$10$DE4SqPby2qAgzuuxlKgHPuRR6pkhr5Lak5gh4g7BeOAdtaNEqNEly</column>
+        </table>
+        <table name="account">
+            <column name="accountID">30577412345</column>
+            <column name="username">Brian</column>
+            <column name="password">$2a$10$WnVdndyCdVWIT6F5PY/W8uwoXHJeh4MkLygAENmvE1xl7C4MFecFK</column>
+        </table>
+        <table name="account">
+            <column name="accountID">63063112345</column>
+            <column name="username">Jennifer</column>
+            <column name="password">$2a$10$SqmkJxAa9GjSBTSzUO9kY.rJ7g1876nKHf1BnUuYQmj6nH.Q43kOq</column>
+        </table>
+        <table name="account">
+            <column name="accountID">50000012345</column>
+            <column name="username">Barrack</column>
+            <column name="password">$2a$10$I87aXvCSYM4xQVytUbkzzOINez8Gyq12LbZNJY1ibtrSERCkJEnXK</column>
+        </table>
+        <table name="account">
+            <column name="accountID">70382512345</column>
+            <column name="username">Obarack</column>
+            <column name="password">$2a$10$diT.kw1XMhaqZ.2TyLZutuBcoQlC2/qDgqoFLSzQRWuiveOBU78sS</column>
+        </table>
+        <!-- Таблица activity -->
+        <table name="activity">
+            <column name="accountID">0</column>
+            <column name="actionID">0</column>
+            <column name="action">NA</column>
+            <column name="actiondatetime">1000-01-01 00:00:00</column>
+        </table>
+        <table name="activity">
+            <column name="accountID">20033112345</column>
+            <column name="actionID">200331123450001</column>
+            <column name="action">deposit 20 c.u. from 1234567000001</column>
+            <column name="actiondatetime">2018-12-01 00:01:29</column>
+        </table>
+        <table name="activity">
+            <column name="accountID">20033112345</column>
+            <column name="actionID">200331123450002</column>
+            <column name="action">withdraw 42 c.u. from 1234567000002</column>
+            <column name="actiondatetime">2018-12-11 00:02:34</column>
+        </table>
+        <table name="activity">
+            <column name="accountID">45638912345</column>
+            <column name="actionID">456389123450001</column>
+            <column name="action">withdraw 42 c.u. from 1891751000001</column>
+            <column name="actiondatetime">2018-11-05 07:05:38</column>
+        </table>
+        <table name="activity">
+            <column name="accountID">42006412345</column>
+            <column name="actionID">420064123450001</column>
+            <column name="action">withdraw 42 c.u. from 9999999000001</column>
+            <column name="actiondatetime">2018-11-25 08:05:36</column>
+        </table>
+        <table name="activity">
+            <column name="accountID">45385012345</column>
+            <column name="actionID">453850123450001</column>
+            <column name="action">withdraw 42 c.u. from 1234568000001</column>
+            <column name="actiondatetime">2018-11-26 23:35:39</column>
+        </table>
+        <table name="activity">
+            <column name="accountID">61923012345</column>
+            <column name="actionID">619230123450001</column>
+            <column name="action">withdraw 42 c.u. from 1111111000001</column>
+            <column name="actiondatetime">2018-11-21 09:35:35</column>
+        </table>
+        <table name="activity">
+            <column name="accountID">30577412345</column>
+            <column name="actionID">305774123450001</column>
+            <column name="action">withdraw 42 c.u. from 2222222000001</column>
+            <column name="actiondatetime">2018-12-01 12:35:59</column>
+        </table>
+        <table name="activity">
+            <column name="accountID">63063112345</column>
+            <column name="actionID">630631123450001</column>
+            <column name="action">deposit 20 c.u. from 8080808000001</column>
+            <column name="actiondatetime">2018-10-04 13:39:00</column>
+        </table>
+        <table name="activity">
+            <column name="accountID">63063112345</column>
+            <column name="actionID">630631123450002</column>
+            <column name="action">deposit 55 c.u. from 8080808000002</column>
+            <column name="actiondatetime">2018-10-13 14:32:59</column>
+        </table>
+        <table name="activity">
+            <column name="accountID">63063112345</column>
+            <column name="actionID">630631123450003</column>
+            <column name="action">deposit 19 c.u. from 8080808000003</column>
+            <column name="actiondatetime">2018-10-12 15:59:50</column>
+        </table>
+        <table name="activity">
+            <column name="accountID">50000012345</column>
+            <column name="actionID">500000123450001</column>
+            <column name="action">deposit 1000 c.u. from 4124125000001</column>
+            <column name="actiondatetime">2018-10-14 15:02:54</column>
+        </table>
+        <table name="activity">
+            <column name="accountID">70382512345</column>
+            <column name="actionID">703825123450001</column>
+            <column name="action">deposit 102 c.u. from 2523626000001</column>
+            <column name="actiondatetime">2018-12-11 00:02:54</column>
+        </table>
+        <table name="activity">
+            <column name="accountID">20033112345</column>
+            <column name="actionID">200331123450003</column>
+            <column name="action">deposit 15.15 c.u. from 1234567000001</column>
+            <column name="actiondatetime">2018-12-09 20:07:29</column>
+        </table>
+        <table name="activity">
+            <column name="accountID">20033112345</column>
+            <column name="actionID">200331123450005</column>
+            <column name="action">deposit 5555 c.u. from 1234567000001</column>
+            <column name="actiondatetime">2018-12-11 11:18:20</column>
+        </table>
+        <table name="activity">
+            <column name="accountID">20033112345</column>
+            <column name="actionID">200331123450004</column>
+            <column name="action">withdraw 4407.92 c.u. from 1234567000001</column>
+            <column name="actiondatetime">2018-12-11 11:18:11</column>
+        </table>
+        <table name="activity">
+            <column name="accountID">20033112345</column>
+            <column name="actionID">200331123450006</column>
+            <column name="action">withdraw 300.78 c.u. from 1234567000002</column>
+            <column name="actiondatetime">2018-12-11 11:22:53</column>
+        </table>
+        <table name="activity">
+            <column name="accountID">20033112345</column>
+            <column name="actionID">200331123450007</column>
+            <column name="action">deposit 300.005478 c.u. from 1234567000002</column>
+            <column name="actiondatetime">2018-12-11 11:23:08</column>
+        </table>
+        <table name="activity">
+            <column name="accountID">20033112345</column>
+            <column name="actionID">200331123450008</column>
+            <column name="action">deposit 55 c.u. from 1234567000001</column>
+            <column name="actiondatetime">2018-12-11 11:23:17</column>
+        </table>
+        <table name="activity">
+            <column name="accountID">20033112345</column>
+            <column name="actionID">200331123450009</column>
+            <column name="action">withdraw 300.005477 c.u. from 1234567000002</column>
+            <column name="actiondatetime">2018-12-11 11:25:37</column>
+        </table>
+        <table name="activity">
+            <column name="accountID">20033112345</column>
+            <column name="actionID">200331123450010</column>
+            <column name="action">deposit 300.12547 c.u. from 1234567000002</column>
+            <column name="actiondatetime">2018-12-11 11:25:47</column>
+        </table>
+        <!-- Таблица bankaccount -->
+        <table name="bankaccount">
+            <column name="accountID">0</column>
+            <column name="currencyaccountID">0</column>
+            <column name="balance">0.0000000000</column>
+            <column name="currency">NA</column>
+        </table>
+        <table name="bankaccount">
+            <column name="accountID">20033112345</column>
+            <column name="currencyaccountID">1234567000001</column>
+            <column name="balance">5610.0000000000</column>
+            <column name="currency">CAD</column>
+        </table>
+        <table name="bankaccount">
+            <column name="accountID">20033112345</column>
+            <column name="currencyaccountID">1234567000002</column>
+            <column name="balance">300.1254710000</column>
+            <column name="currency">USD</column>
+        </table>
+        <table name="bankaccount">
+            <column name="accountID">45638912345</column>
+            <column name="currencyaccountID">1891751000001</column>
+            <column name="balance">513262.1100000000</column>
+            <column name="currency">USD</column>
+        </table>
+        <table name="bankaccount">
+            <column name="accountID">42006412345</column>
+            <column name="currencyaccountID">9999999000001</column>
+            <column name="balance">139899.3300000000</column>
+            <column name="currency">USD</column>
+        </table>
+        <table name="bankaccount">
+            <column name="accountID">45385012345</column>
+            <column name="currencyaccountID">1234568000001</column>
+            <column name="balance">12415.1410000000</column>
+            <column name="currency">RUPI</column>
+        </table>
+        <table name="bankaccount">
+            <column name="accountID">61923012345</column>
+            <column name="currencyaccountID">1111111000001</column>
+            <column name="balance">15151.1450000000</column>
+            <column name="currency">CAD</column>
+        </table>
+        <table name="bankaccount">
+            <column name="accountID">30577412345</column>
+            <column name="currencyaccountID">2222222000001</column>
+            <column name="balance">87687.1213000000</column>
+            <column name="currency">USD</column>
+        </table>
+        <table name="bankaccount">
+            <column name="accountID">63063112345</column>
+            <column name="currencyaccountID">8080808000001</column>
+            <column name="balance">211.1112300000</column>
+            <column name="currency">EUR</column>
+        </table>
+        <table name="bankaccount">
+            <column name="accountID">63063112345</column>
+            <column name="currencyaccountID">8080808000002</column>
+            <column name="balance">21111031.1100000000</column>
+            <column name="currency">RUB</column>
+        </table>
+        <table name="bankaccount">
+            <column name="accountID">63063112345</column>
+            <column name="currencyaccountID">8080808000003</column>
+            <column name="balance">9991.1130000000</column>
+            <column name="currency">USD</column>
+        </table>
+        <table name="bankaccount">
+            <column name="accountID">50000012345</column>
+            <column name="currencyaccountID">4124125000001</column>
+            <column name="balance">1782641421.1414000000</column>
+            <column name="currency">USD</column>
+        </table>
+        <table name="bankaccount">
+            <column name="accountID">70382512345</column>
+            <column name="currencyaccountID">2523626000001</column>
+            <column name="balance">3525235.1417000000</column>
+            <column name="currency">USD</column>
+        </table>
+        <!-- Таблица bankdb -->
+        <table name="bankdb">
+            <column name="accountID">0</column>
+            <column name="SIN">0</column>
+            <column name="lastactivity">NA</column>
+        </table>
+        <table name="bankdb">
+            <column name="accountID">20033112345</column>
+            <column name="SIN">1234567</column>
+            <column name="lastactivity">Tue Dec 11 12:59:22 MSK 2018</column>
+        </table>
+        <table name="bankdb">
+            <column name="accountID">45638912345</column>
+            <column name="SIN">1891751</column>
+            <column name="lastactivity">Mon May 09 22:06:05 EDT 2016</column>
+        </table>
+        <table name="bankdb">
+            <column name="accountID">42006412345</column>
+            <column name="SIN">9999999</column>
+            <column name="lastactivity">Wed May 11 00:18:46 EDT 2016</column>
+        </table>
+        <table name="bankdb">
+            <column name="accountID">45385012345</column>
+            <column name="SIN">1234568</column>
+            <column name="lastactivity">None</column>
+        </table>
+        <table name="bankdb">
+            <column name="accountID">61923012345</column>
+            <column name="SIN">1111111</column>
+            <column name="lastactivity">None</column>
+        </table>
+        <table name="bankdb">
+            <column name="accountID">30577412345</column>
+            <column name="SIN">2222222</column>
+            <column name="lastactivity">None</column>
+        </table>
+        <table name="bankdb">
+            <column name="accountID">63063112345</column>
+            <column name="SIN">8080808</column>
+            <column name="lastactivity">Wed May 11 01:25:01 EDT 2016</column>
+        </table>
+        <table name="bankdb">
+            <column name="accountID">50000012345</column>
+            <column name="SIN">4124125</column>
+            <column name="lastactivity">None</column>
+        </table>
+        <table name="bankdb">
+            <column name="accountID">70382512345</column>
+            <column name="SIN">2523626</column>
+            <column name="lastactivity">None</column>
+        </table>
+        <!-- Таблица clientinfo -->
+        <table name="clientinfo">
+            <column name="name">admin</column>
+            <column name="lastname">admin</column>
+            <column name="SIN">0</column>
+            <column name="birthdate">1000-01-01</column>
+        </table>
+        <table name="clientinfo">
+            <column name="name">Berk</column>
+            <column name="lastname">Soysal</column>
+            <column name="SIN">1234567</column>
+            <column name="birthdate">1995-02-22</column>
+        </table>
+        <table name="clientinfo">
+            <column name="name">John</column>
+            <column name="lastname">Snow</column>
+            <column name="SIN">1891751</column>
+            <column name="birthdate">1977-04-11</column>
+        </table>
+        <table name="clientinfo">
+            <column name="name">Oliver</column>
+            <column name="lastname">Young</column>
+            <column name="SIN">9999999</column>
+            <column name="birthdate">1992-11-22</column>
+        </table>
+        <table name="clientinfo">
+            <column name="name">Ricardinho</column>
+            <column name="lastname">Oliveria</column>
+            <column name="SIN">1234568</column>
+            <column name="birthdate">1991-12-11</column>
+        </table>
+        <table name="clientinfo">
+            <column name="name">NEW</column>
+            <column name="lastname">NEW</column>
+            <column name="SIN">1111111</column>
+            <column name="birthdate">1992-01-22</column>
+        </table>
+        <table name="clientinfo">
+            <column name="name">Brian</column>
+            <column name="lastname">Foster</column>
+            <column name="SIN">2222222</column>
+            <column name="birthdate">1992-02-11</column>
+        </table>
+        <table name="clientinfo">
+            <column name="name">Jennifer</column>
+            <column name="lastname">Lopez</column>
+            <column name="SIN">8080808</column>
+            <column name="birthdate">1933-12-13</column>
+        </table>
+        <table name="clientinfo">
+            <column name="name">Barrack</column>
+            <column name="lastname">Obama</column>
+            <column name="SIN">4124125</column>
+            <column name="birthdate">1965-04-11</column>
+        </table>
+        <table name="clientinfo">
+            <column name="name">Obarack</column>
+            <column name="lastname">Burama</column>
+            <column name="SIN">2523626</column>
+            <column name="birthdate">1952-04-11</column>
+        </table>
+    </database>
+</pma_xml_export>

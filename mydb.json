@@ -1,0 +1,88 @@
+[
+{"type":"header","version":"4.8.3","comment":"Export to JSON plugin for PHPMyAdmin"},
+{"type":"database","name":"mydb"},
+{"type":"table","name":"account","database":"mydb","data":
+[
+{"accountID":"0","username":"admin","password":"$2a$10$dfpH\/XruGxYxHgvyjb\/OAOA4PRRcxnW6iz0RLleyt3w8J\/OOrnsmi"},
+{"accountID":"20033112345","username":"berks","password":"$2a$10$BzxqhvHh8zSPCdAY65fT2uV\/VeyyNTgOjRxm13xLycTMhonI052p2"},
+{"accountID":"45638912345","username":"johns","password":"$2a$10$gjyP1IwB9shgOlmBI5\/nMu0PK7JAe6exwdeSU1cXom\/2iWABr2L7K"},
+{"accountID":"42006412345","username":"Oliver","password":"$2a$10$sheazP1KkpszPXhgT928S.NfJNMLa83hJZdZAVYZCHjtwi1K155X2"},
+{"accountID":"45385012345","username":"deneme","password":"$2a$10$bN7z2koeTrMciZEXwnKi0OnJRY4aaZ5XvFEP\/H4w\/3zgaW3c6rzEG"},
+{"accountID":"61923012345","username":"NEW","password":"$2a$10$DE4SqPby2qAgzuuxlKgHPuRR6pkhr5Lak5gh4g7BeOAdtaNEqNEly"},
+{"accountID":"30577412345","username":"Brian","password":"$2a$10$WnVdndyCdVWIT6F5PY\/W8uwoXHJeh4MkLygAENmvE1xl7C4MFecFK"},
+{"accountID":"63063112345","username":"Jennifer","password":"$2a$10$SqmkJxAa9GjSBTSzUO9kY.rJ7g1876nKHf1BnUuYQmj6nH.Q43kOq"},
+{"accountID":"50000012345","username":"Barrack","password":"$2a$10$I87aXvCSYM4xQVytUbkzzOINez8Gyq12LbZNJY1ibtrSERCkJEnXK"},
+{"accountID":"70382512345","username":"Obarack","password":"$2a$10$diT.kw1XMhaqZ.2TyLZutuBcoQlC2\/qDgqoFLSzQRWuiveOBU78sS"}
+]
+}
+,{"type":"table","name":"activity","database":"mydb","data":
+[
+{"accountID":"0","actionID":"0","action":"NA","actiondatetime":"1000-01-01 00:00:00"},
+{"accountID":"20033112345","actionID":"200331123450001","action":"deposit 20 c.u. from 1234567000001","actiondatetime":"2018-12-01 00:01:29"},
+{"accountID":"20033112345","actionID":"200331123450002","action":"withdraw 42 c.u. from 1234567000002","actiondatetime":"2018-12-11 00:02:34"},
+{"accountID":"45638912345","actionID":"456389123450001","action":"withdraw 42 c.u. from 1891751000001","actiondatetime":"2018-11-05 07:05:38"},
+{"accountID":"42006412345","actionID":"420064123450001","action":"withdraw 42 c.u. from 9999999000001","actiondatetime":"2018-11-25 08:05:36"},
+{"accountID":"45385012345","actionID":"453850123450001","action":"withdraw 42 c.u. from 1234568000001","actiondatetime":"2018-11-26 23:35:39"},
+{"accountID":"61923012345","actionID":"619230123450001","action":"withdraw 42 c.u. from 1111111000001","actiondatetime":"2018-11-21 09:35:35"},
+{"accountID":"30577412345","actionID":"305774123450001","action":"withdraw 42 c.u. from 2222222000001","actiondatetime":"2018-12-01 12:35:59"},
+{"accountID":"63063112345","actionID":"630631123450001","action":"deposit 20 c.u. from 8080808000001","actiondatetime":"2018-10-04 13:39:00"},
+{"accountID":"63063112345","actionID":"630631123450002","action":"deposit 55 c.u. from 8080808000002","actiondatetime":"2018-10-13 14:32:59"},
+{"accountID":"63063112345","actionID":"630631123450003","action":"deposit 19 c.u. from 8080808000003","actiondatetime":"2018-10-12 15:59:50"},
+{"accountID":"50000012345","actionID":"500000123450001","action":"deposit 1000 c.u. from 4124125000001","actiondatetime":"2018-10-14 15:02:54"},
+{"accountID":"70382512345","actionID":"703825123450001","action":"deposit 102 c.u. from 2523626000001","actiondatetime":"2018-12-11 00:02:54"},
+{"accountID":"20033112345","actionID":"200331123450003","action":"deposit 15.15 c.u. from 1234567000001","actiondatetime":"2018-12-09 20:07:29"},
+{"accountID":"20033112345","actionID":"200331123450005","action":"deposit 5555 c.u. from 1234567000001","actiondatetime":"2018-12-11 11:18:20"},
+{"accountID":"20033112345","actionID":"200331123450004","action":"withdraw 4407.92 c.u. from 1234567000001","actiondatetime":"2018-12-11 11:18:11"},
+{"accountID":"20033112345","actionID":"200331123450006","action":"withdraw 300.78 c.u. from 1234567000002","actiondatetime":"2018-12-11 11:22:53"},
+{"accountID":"20033112345","actionID":"200331123450007","action":"deposit 300.005478 c.u. from 1234567000002","actiondatetime":"2018-12-11 11:23:08"},
+{"accountID":"20033112345","actionID":"200331123450008","action":"deposit 55 c.u. from 1234567000001","actiondatetime":"2018-12-11 11:23:17"},
+{"accountID":"20033112345","actionID":"200331123450009","action":"withdraw 300.005477 c.u. from 1234567000002","actiondatetime":"2018-12-11 11:25:37"},
+{"accountID":"20033112345","actionID":"200331123450010","action":"deposit 300.12547 c.u. from 1234567000002","actiondatetime":"2018-12-11 11:25:47"}
+]
+}
+,{"type":"table","name":"bankaccount","database":"mydb","data":
+[
+{"accountID":"0","currencyaccountID":"0","balance":"0.0000000000","currency":"NA"},
+{"accountID":"20033112345","currencyaccountID":"1234567000001","balance":"5610.0000000000","currency":"CAD"},
+{"accountID":"20033112345","currencyaccountID":"1234567000002","balance":"300.1254710000","currency":"USD"},
+{"accountID":"45638912345","currencyaccountID":"1891751000001","balance":"513262.1100000000","currency":"USD"},
+{"accountID":"42006412345","currencyaccountID":"9999999000001","balance":"139899.3300000000","currency":"USD"},
+{"accountID":"45385012345","currencyaccountID":"1234568000001","balance":"12415.1410000000","currency":"RUPI"},
+{"accountID":"61923012345","currencyaccountID":"1111111000001","balance":"15151.1450000000","currency":"CAD"},
+{"accountID":"30577412345","currencyaccountID":"2222222000001","balance":"87687.1213000000","currency":"USD"},
+{"accountID":"63063112345","currencyaccountID":"8080808000001","balance":"211.1112300000","currency":"EUR"},
+{"accountID":"63063112345","currencyaccountID":"8080808000002","balance":"21111031.1100000000","currency":"RUB"},
+{"accountID":"63063112345","currencyaccountID":"8080808000003","balance":"9991.1130000000","currency":"USD"},
+{"accountID":"50000012345","currencyaccountID":"4124125000001","balance":"1782641421.1414000000","currency":"USD"},
+{"accountID":"70382512345","currencyaccountID":"2523626000001","balance":"3525235.1417000000","currency":"USD"}
+]
+}
+,{"type":"table","name":"bankdb","database":"mydb","data":
+[
+{"accountID":"0","SIN":"0","lastactivity":"NA"},
+{"accountID":"20033112345","SIN":"1234567","lastactivity":"Tue Dec 11 12:59:22 MSK 2018"},
+{"accountID":"45638912345","SIN":"1891751","lastactivity":"Mon May 09 22:06:05 EDT 2016"},
+{"accountID":"42006412345","SIN":"9999999","lastactivity":"Wed May 11 00:18:46 EDT 2016"},
+{"accountID":"45385012345","SIN":"1234568","lastactivity":"None"},
+{"accountID":"61923012345","SIN":"1111111","lastactivity":"None"},
+{"accountID":"30577412345","SIN":"2222222","lastactivity":"None"},
+{"accountID":"63063112345","SIN":"8080808","lastactivity":"Wed May 11 01:25:01 EDT 2016"},
+{"accountID":"50000012345","SIN":"4124125","lastactivity":"None"},
+{"accountID":"70382512345","SIN":"2523626","lastactivity":"None"}
+]
+}
+,{"type":"table","name":"clientinfo","database":"mydb","data":
+[
+{"name":"admin","lastname":"admin","SIN":"0","birthdate":"1000-01-01"},
+{"name":"Berk","lastname":"Soysal","SIN":"1234567","birthdate":"1995-02-22"},
+{"name":"John","lastname":"Snow","SIN":"1891751","birthdate":"1977-04-11"},
+{"name":"Oliver","lastname":"Young","SIN":"9999999","birthdate":"1992-11-22"},
+{"name":"Ricardinho","lastname":"Oliveria","SIN":"1234568","birthdate":"1991-12-11"},
+{"name":"NEW","lastname":"NEW","SIN":"1111111","birthdate":"1992-01-22"},
+{"name":"Brian","lastname":"Foster","SIN":"2222222","birthdate":"1992-02-11"},
+{"name":"Jennifer","lastname":"Lopez","SIN":"8080808","birthdate":"1933-12-13"},
+{"name":"Barrack","lastname":"Obama","SIN":"4124125","birthdate":"1965-04-11"},
+{"name":"Obarack","lastname":"Burama","SIN":"2523626","birthdate":"1952-04-11"}
+]
+}
+]
